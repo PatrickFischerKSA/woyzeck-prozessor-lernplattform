@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Woyzeck-Prozessor",
-  description: "Interaktive Montage- und Interpretationsumgebung zu Georg Büchners Woyzeck.",
+  title: "Woyzeck · Montagewerkstatt",
+  description: "Eine offene Lernwerkstatt zu Büchners Woyzeck: Szenen montieren, Deutungen am Text prüfen und eigene Lesarten überarbeiten.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

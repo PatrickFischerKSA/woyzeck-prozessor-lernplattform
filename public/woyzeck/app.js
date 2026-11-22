@@ -13,7 +13,7 @@ const scenes = [
   {
     id: 2,
     title: "Die Stadt",
-    place: "Marie's Fenster",
+    place: "Maries Fenster",
     phase: "Begehren",
     figures: ["Marie", "Kind", "Margreth", "Tambourmajor", "Woyzeck"],
     summary: "Marie beobachtet den Zapfenstreich und den Tambourmajor. Margreth verspottet sie, Woyzeck erscheint kurz und berichtet verstört vom Feld.",
@@ -60,7 +60,7 @@ const scenes = [
     place: "Maries Zimmer",
     phase: "Verführung",
     figures: ["Marie", "Tambourmajor"],
-    summary: "Der Tambourmajor tritt zu Marie. Seine Körperlichkeit, Uniform und Grobheit verführen und bedrängen sie zugleich.",
+    summary: "Der Tambourmajor tritt zu Marie. Zwischen Anziehung und körperlichem Bedrängen entsteht eine konflikthafte Begegnung.",
     function: "Das erotische Gegengewicht zu Woyzecks Armut wird körperlich zugespitzt.",
     stage: "Enge Kammer, große Uniformfigur; Nähe soll zugleich attraktiv und aggressiv wirken.",
     motifs: ["Begehren", "Körper", "Gewalt", "Militär"]
@@ -71,7 +71,7 @@ const scenes = [
     place: "Straße",
     phase: "Verdacht",
     figures: ["Marie", "Woyzeck"],
-    summary: "Woyzeck stellt Marie wegen ihrer Untreue zur Rede. Marie weicht aus, provoziert ihn aber auch mit Trotz.",
+    summary: "Woyzeck konfrontiert Marie mit seinem Verdacht. Marie widerspricht und wehrt sich gegen seine Drohungen.",
     function: "Der private Konflikt kippt in Misstrauen, Kränkung und Besitzdenken.",
     stage: "Kurzer harter Schlagabtausch, am besten fast ohne psychologische Auspolsterung.",
     motifs: ["Eifersucht", "Schuld", "Sprache", "Gewalt"]
@@ -215,7 +215,7 @@ const scenes = [
     phase: "Mord",
     figures: ["Woyzeck", "Marie"],
     summary: "Woyzeck führt Marie hinaus. In der Abendstimmung tötet er sie mit dem Messer.",
-    function: "Kulminationspunkt: soziale, psychische und erotische Gewalt entlädt sich in der Tat.",
+    function: "Woyzeck tötet Marie. Welche Vorgeschichte die Montage sichtbar macht, verändert den Blick auf die Tat, hebt seine Verantwortung aber nicht auf.",
     stage: "Nicht naturalistisch auswalzen; Distanz, Dämmerung und Stille können stärker sein.",
     motifs: ["Gewalt", "Eifersucht", "Natur", "Tod"]
   },
@@ -309,7 +309,7 @@ const buildCount = document.querySelector("#buildCount");
 const floatingBuildCount = document.querySelector("#floatingBuildCount");
 const processorDialog = document.querySelector("#processorDialog");
 const openProcessorBtn = document.querySelector("#openProcessorBtn");
-const closeProcessorBtn = document.querySelector("#closeProcessorBtn");
+
 const notesInput = document.querySelector("#notesInput");
 const modeSelect = document.querySelector("#modeSelect");
 const firstSceneSelect = document.querySelector("#firstSceneSelect");
@@ -336,7 +336,12 @@ const stopSpeechBtn = document.querySelector("#stopSpeechBtn");
 const resetConversationBtn = document.querySelector("#resetConversationBtn");
 const speechStatus = document.querySelector("#speechStatus");
 
-let build = JSON.parse(localStorage.getItem("woyzeckBuild") || "[]");
+function readStored(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+}
+let build = readStored("woyzeckBuild", []);
+if (!Array.isArray(build)) build = [];
+build = [...new Set(build.filter(id => Number.isInteger(id) && scenes.some(scene => scene.id === id)))];
 notesInput.value = localStorage.getItem("woyzeckNotes") || "";
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
@@ -585,7 +590,11 @@ function renderCards() {
       chip.textContent = motif;
       return chip;
     }));
-    card.querySelector(".add-btn").addEventListener("click", () => addScene(scene.id));
+    const addButton = card.querySelector(".add-btn");
+    addButton.textContent = build.includes(scene.id) ? "In deiner Fassung" : "Zur Fassung hinzufügen";
+    addButton.disabled = build.includes(scene.id);
+    addButton.setAttribute("aria-label", `${addButton.textContent}: ${scene.title} (Karte ${scene.id})`);
+    addButton.addEventListener("click", () => addScene(scene.id));
     card.addEventListener("dragstart", (event) => {
       event.dataTransfer.setData("text/plain", String(scene.id));
       card.classList.add("dragging");
@@ -593,7 +602,8 @@ function renderCards() {
     card.addEventListener("dragend", () => card.classList.remove("dragging"));
     cardGrid.append(card);
   });
-  visibleCount.textContent = `${filtered.length} Karten`;
+  visibleCount.textContent = `${filtered.length} / 27 Karten`;
+  document.querySelector("#emptySearch").hidden = filtered.length > 0;
 }
 
 function saveBuild() {
@@ -711,7 +721,7 @@ function renderStepState() {
     : "Du erzählst vorwärts. Die aktuell entwickelte Handlung führt";
   const openCount = scenes.length - sequence.length;
   const chain = sequence.map((scene) => scene.phase).join(" → ");
-  stepStoryOutput.textContent = `${directionText} von ${formatSceneRef(first)} bis ${formatSceneRef(last)}. Bisherige Bewegungslogik: ${chain}. Noch offen: ${openCount} Szene(n). ${buildMurderExplanation(sequence, sequence.findIndex((scene) => scene.id === 20) + 1 || null)}`;
+  stepStoryOutput.textContent = `${directionText} von ${formatSceneRef(first)} bis ${formatSceneRef(last)}. Bisherige Bewegungslogik: ${chain}. Noch offen: ${openCount} Szene(n). Welche Wirkung hat dieser Übergang? Begründe sie im Denkprotokoll.`;
 }
 
 function generateCombination() {
@@ -759,6 +769,7 @@ function generateCombination() {
 }
 
 function addScene(id) {
+  if (build.includes(Number(id)) || !sceneById(Number(id))) return;
   build.push(Number(id));
   saveBuild();
   renderBuild();
@@ -798,6 +809,13 @@ function renderBuild() {
       </div>
     `;
     const [upBtn, downBtn, removeBtn] = item.querySelectorAll("button");
+    upBtn.disabled = index === 0;
+    downBtn.disabled = index === build.length - 1;
+    upBtn.textContent = "Höher";
+    downBtn.textContent = "Tiefer";
+    upBtn.setAttribute("aria-label", `${scene.title} nach vorne verschieben`);
+    downBtn.setAttribute("aria-label", `${scene.title} nach hinten verschieben`);
+    removeBtn.setAttribute("aria-label", `${scene.title} entfernen`);
     upBtn.addEventListener("click", () => moveScene(index, -1));
     downBtn.addEventListener("click", () => moveScene(index, 1));
     removeBtn.addEventListener("click", () => removeScene(index));
@@ -808,6 +826,8 @@ function renderBuild() {
   floatingBuildCount.textContent = countText;
   renderReading();
   renderStepState();
+  renderCards();
+  document.dispatchEvent(new CustomEvent("montagechange"));
 }
 
 function sceneById(id) {
@@ -1240,38 +1260,7 @@ function resetConversation() {
 }
 
 function exportBuild() {
-  renderReading();
-  const lines = [
-    "Woyzeck-Prozessor: Meine Fassung",
-    "Textgrundlage: https://buechnerportal.de/werke/woyzeck/",
-    "Hinweis: Woyzeck ist als Fragment in mehreren Handschriften überliefert; diese Fassung ist eine didaktische Montage.",
-    "",
-    ...build.map((id, index) => {
-      const scene = scenes.find((item) => item.id === id);
-      return `${index + 1}. Szene ${scene.id}: ${scene.title} (${scene.place})\n   Funktion: ${scene.function}\n   Motive: ${scene.motifs.join(", ")}`;
-    }),
-    "",
-    "Regieidee / Begründung:",
-    notesInput.value.trim() || "-",
-    "",
-    "Automatische Auswertung:",
-    `Handlung: ${plotOutput.textContent}`,
-    `Woyzeck und Marie: ${interpretationOutput.textContent}`,
-    `Morderklärung: ${murderOutput.textContent}`,
-    "",
-    "Schrittmodus-Zwischenhalt:",
-    stepStoryOutput.textContent,
-    "",
-    "Letztes Figurengespräch:",
-    interviewOutput.textContent
-  ];
-  const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "woyzeck-fassung.txt";
-  link.click();
-  URL.revokeObjectURL(url);
+  if (typeof exportPortfolio === "function") exportPortfolio();
 }
 
 buildList.addEventListener("dragover", (event) => {
@@ -1309,6 +1298,7 @@ document.querySelector("#clearBuildBtn").addEventListener("click", () => {
 });
 
 document.querySelector("#resetBtn").addEventListener("click", () => {
+  if (!confirm("Aktuelle Montage und Regiebegründung leeren? Gesicherte Fassungen A/B und dein Denkprotokoll bleiben erhalten.")) return;
   searchInput.value = "";
   motifFilter.value = "all";
   figureFilter.value = "all";
@@ -1341,15 +1331,8 @@ document.querySelector("#generateBtn").addEventListener("click", generateCombina
 document.querySelector("#refreshReadingBtn").addEventListener("click", renderReading);
 document.querySelector("#clearPinsBtn").addEventListener("click", clearPins);
 openProcessorBtn.addEventListener("click", () => {
-  if (typeof processorDialog.showModal === "function") {
-    processorDialog.showModal();
-  } else {
-    processorDialog.setAttribute("open", "");
-  }
-});
-closeProcessorBtn.addEventListener("click", () => processorDialog.close());
-processorDialog.addEventListener("click", (event) => {
-  if (event.target === processorDialog) processorDialog.close();
+  location.hash = "werkstatt";
+  processorDialog.scrollIntoView({ block: "start" });
 });
 document.querySelector("#startStepBtn").addEventListener("click", startStepGame);
 document.querySelector("#chooseStepBtn").addEventListener("click", () => chooseStep());
@@ -1394,7 +1377,7 @@ const reductionData = {
 };
 
 const witnessData = {
-  marie: { label:"MARIE / EIGENES LEBEN",title:"Begehren ist kein Tatmotiv.",text:"Marie begehrt, lügt, schämt sich, sorgt, widerspricht. Sobald die Kamera bei ihr bleibt, wird Woyzecks Eifersucht vom Zentrum zur Bedrohung.",life:"Fenster, Schmuck, Tanz und Bibel zeigen keinen linearen moralischen Abstieg, sondern den engen Spielraum einer armen, öffentlich kontrollierten Mutter.",violence:"Sie wird von Margreth beschämt, vom Tambourmajor zugleich begehrt und bedrängt und von Woyzeck zunehmend als Besitz behandelt.",erasure:"Lesarten, die sie nur als ‚untreue Geliebte‘ führen, übernehmen Woyzecks Kränkung als Ordnung des Dramas.",losses:["Leben","Zukunft","Mutterschaft","eigene Erzählung"],boundary:"Der geplante Femizid ist Woyzecks Tat." },
+  marie: { label:"MARIE / EIGENES LEBEN",title:"Marie besitzt eine eigene Geschichte.",text:"Marie begehrt, lügt, schämt sich, sorgt, widerspricht. Sobald die Kamera bei ihr bleibt, wird Woyzecks Eifersucht vom Zentrum zur Bedrohung.",life:"Fenster, Schmuck, Tanz und Bibel zeigen keinen linearen moralischen Abstieg, sondern den engen Spielraum einer armen, öffentlich kontrollierten Mutter.",violence:"Sie wird von Margreth beschämt, vom Tambourmajor zugleich begehrt und bedrängt und von Woyzeck zunehmend als Besitz behandelt.",erasure:"Lesarten, die sie nur als ‚untreue Geliebte‘ führen, übernehmen Woyzecks Kränkung als Ordnung des Dramas.",losses:["Leben","Zukunft","Mutterschaft","eigene Erzählung"],boundary:"Der geplante Femizid ist Woyzecks Tat." },
   bernhard: { label:"BERNHARD / ANGEHÖRIGER",title:"Verlust ist mehr als Information.",text:"Aussagen können geprüft werden, ohne Trauer in Verdacht aufzulösen. Als Vater und Partner verliert Bernhard Menschen – nicht nur Gewissheiten.",life:"Notruf, Aussagen und öffentliche Rekonstruktion zeigen nur Ausschnitte. Hinter der Quellenfunktion steht eine zerstörte Familienbiografie.",violence:"Er ist nicht körperliches Tatopfer, aber Angehöriger der getöteten Kinder und Betroffener einer langen kriminalistischen und medialen Verarbeitung.",erasure:"True-Crime-Logik reduziert Angehörige leicht auf Verdachtsmoment, Zeugenwert oder emotionale Reaktion.",losses:["Kinder","Familie","Privatheit","Vertrauen"],boundary:"Quellenkritik hebt Betroffenheit nicht auf." },
   kinder: { label:"KINDER / KEINE REQUISITEN",title:"Die Zukunft fehlt im Täterplot.",text:"Sophie und ihre Geschwister im realen Fall, Christian im Drama, Tobias in Hauptmanns Novelle: Kinder tragen Folgen, die sie weder gewählt noch verursacht haben.",life:"Die Texte geben ihnen unterschiedlich viel Sprache. Gerade geringe Präsenz verlangt, Beziehungen, Abhängigkeit und Zukunft mitzulesen.",violence:"Tobias erlebt Misshandlung und tödliche Vernachlässigung; Christian verliert seine Mutter und möglicherweise auch den Vater; die Scherrer-Kinder werden getötet.",erasure:"Kinder werden besonders leicht zu Auslösern von Ermittlungen, Symbolen zerstörter Unschuld oder emotionalen Verstärkern.",losses:["Leben","Schutz","Eltern","Zukunft"],boundary:"Keine Gewaltdetails als Spannungsmittel." },
   lene: { label:"LENE / DOPPELTE WAHRHEIT",title:"Gewalt erfahren. Gewalt ausgeübt.",text:"Lene misshandelt Tobias und wird von Thiel getötet. Digitale Perspektivverschiebung heißt hier: nichts verrechnen, nichts löschen.",life:"Als Arbeiterfrau in materieller Enge besitzt sie wenig gesellschaftliche Macht, innerhalb des Hauses aber erhebliche körperliche Macht über Tobias und Thiel.",violence:"Sie ist Täterin gegenüber Tobias und Opfer der tödlichen Gewalt Thiels. Diese Rollen folgen verschiedenen Beziehungen und dürfen nicht verrechnet werden.",erasure:"Eine rein dämonisierende Darstellung macht ihren Tod zur Strafe; eine rein sozialdeterministische Darstellung verwischt Tobias’ Leiden.",losses:["Leben","Stimme","Kontext","Ambivalenz"],boundary:"Ihre Gewalt entzieht ihr nicht den Opferstatus ihrer Tötung." }
@@ -1417,7 +1400,7 @@ function activateButtons(selector, active) {
 
 function renderSignal(key) {
   const data = signalData[key];
-  document.querySelector("#signalDisplay").innerHTML = `<span class="signal-stamp">${data.stamp}</span><blockquote>${data.quote}</blockquote><div class="signal-fragments">${data.fragments.map((word) => `<b>${word}</b>`).join("")}</div><p class="signal-thesis">${data.reading}</p><div class="analysis-layers">${data.layers.map((layer) => `<article><span>${layer.k}</span><p>${layer.v}</p></article>`).join("")}</div>`;
+  document.querySelector("#signalDisplay").innerHTML = `<span class="signal-stamp">${data.stamp}</span><blockquote>${data.quote}</blockquote><div class="signal-fragments">${data.fragments.map((word) => `<b>${word}</b>`).join("")}</div><details class="suggestion"><summary>Deutungsvorschlag prüfen</summary><p class="signal-thesis">${data.reading}</p><div class="analysis-layers">${data.layers.map((layer) => `<article><span>${layer.k}</span><p>${layer.v}</p></article>`).join("")}</div></details>`;
   const remaining = 3 - visitedSignals.size;
   const guide = document.querySelector("#signalGuide");
   if (remaining > 0) {
@@ -1425,7 +1408,7 @@ function renderSignal(key) {
     const labels = { feld: "Feld", labor: "Labor", erbsen: "Archiv" };
     guide.innerHTML = `<b>${visitedSignals.size}/3 Spuren geöffnet</b><span>Als Nächstes: ${labels[next]}. Prüfe, wodurch sich die Autorität über Wirklichkeit verändert.</span>`;
   } else {
-    guide.innerHTML = `<b>Vergleich vollständig</b><span>Ergebnis: Wirklichkeit ist nicht einfach „unsicher“. Sie wird von Wahrnehmung, institutioneller Sprache und historischem Wissen jeweils anders hergestellt.</span>`;
+    guide.innerHTML = `<b>Drei Spuren verfügbar</b><span>Welche Spur widerspricht deiner ersten Vermutung? Belege deine Antwort mit einer Textstelle; das Öffnen der Spuren entscheidet keine Deutung.</span>`;
     guide.classList.add("complete");
   }
 }
@@ -1439,7 +1422,7 @@ function renderReduction() {
   if (visitedWorks.size < 2 || visitedLenses.size < 2) {
     guide.innerHTML = `<b>${visitedWorks.size}/3 Werke · ${visitedLenses.size}/4 Linsen</b><span>Wechsle ${visitedWorks.size < 2 ? "jetzt das Werk" : "jetzt die Linse"}. Erst die Differenz macht aus drei Einzelbefunden einen Vergleich.</span>`;
   } else {
-    guide.innerHTML = `<b>Vergleich hergestellt</b><span>Konstante: Menschen werden lesbar gemacht. Unterschied: Drama, Novelle und True Crime verteilen Wahrnehmung und Deutungsmacht verschieden.</span>`;
+    guide.innerHTML = `<b>Perspektiven geöffnet</b><span>Gilt dieselbe Erklärung für beide Werke? Halte einen belegbaren Unterschied fest und prüfe, wo die Vergleichsthese nicht trägt.</span>`;
     guide.classList.add("complete");
   }
 }
@@ -1452,7 +1435,7 @@ function renderWitness(key) {
   if (remaining > 0) {
     guide.innerHTML = `<b>${visitedWitnesses.size}/4 Perspektiven im Bild</b><span>Noch ${remaining}: Mit jedem Wechsel verliert die Tätergeschichte ein Stück ihres Deutungsmonopols.</span>`;
   } else {
-    guide.innerHTML = `<b>Gegenblick vollständig</b><span>Die gemeinsame Kategorie ist nicht Unschuld oder Eindeutigkeit, sondern Verlust. Ambivalenz darf benannt werden, ohne Verantwortung zu verschieben.</span>`;
+    guide.innerHTML = `<b>Vier Perspektiven verfügbar</b><span>Welche Perspektive fehlt in deiner Montage? Ändere eine Szenenposition und begründe, was dadurch sichtbar wird.</span>`;
     guide.classList.add("complete");
   }
 }
@@ -1464,33 +1447,6 @@ document.querySelectorAll(".witness-node").forEach((button) => button.addEventLi
 renderSignal("feld");
 renderReduction();
 renderWitness("marie");
-
-const journeySections = [...document.querySelectorAll(".journey-section")];
-const journeyStatus = document.querySelector("#journeyStatus");
-const journeyProgress = document.querySelector("#journeyProgress");
-const journeyLinks = [...document.querySelectorAll(".journey-links a")];
-
-function setJourneyStep(section) {
-  const index = journeySections.indexOf(section);
-  if (index < 0) return;
-  journeyStatus.textContent = section.dataset.journeyLabel;
-  journeyProgress.style.width = `${((index + 1) / journeySections.length) * 100}%`;
-  journeyLinks.forEach((link) => {
-    const active = link.dataset.step === section.id;
-    link.classList.toggle("active", active);
-    if (active) link.setAttribute("aria-current", "step");
-    else link.removeAttribute("aria-current");
-  });
-}
-
-if ("IntersectionObserver" in window) {
-  const journeyObserver = new IntersectionObserver((entries) => {
-    const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-    if (visible[0]) setJourneyStep(visible[0].target);
-  }, { rootMargin: "-20% 0px -58% 0px", threshold: [0, 0.15, 0.35] });
-  journeySections.forEach((section) => journeyObserver.observe(section));
-}
-setJourneyStep(journeySections[0]);
 
 populateFilters();
 populateCombiner();
