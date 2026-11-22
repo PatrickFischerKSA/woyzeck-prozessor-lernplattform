@@ -33,3 +33,6 @@
 @media(max-width:1100px){.manuscript-columns{grid-template-columns:1fr}.manuscript-viewport{height:470px}}
 @media(max-width:500px){.manuscript-reading{padding:18px}.manuscript-transcript{font-size:1.2rem;padding:15px}.manuscript-tools{flex-wrap:wrap}.manuscript-viewport{height:360px}}
 @media print{.manuscript-columns{display:block}.manuscript-tools,.manuscript-choices,.manuscript-live{display:none}.manuscript-viewport{height:auto;max-height:none;overflow:visible;width:55%}.manuscript-sheet{width:100%!important}.manuscript-mark{display:none}.manuscript-reading{padding:15px 0;border:0}.manuscript-reading [data-manuscript-reading][hidden]{display:block!important}.manuscript-transcript{break-inside:avoid}}
+.manuscript-reading [data-manuscript-reading]>label{margin:20px 0}.manuscript-gate{padding:12px 14px;background:#eef2ee;font-size:.875rem!important}.manuscript-answer{border-top:2px solid var(--green);padding-top:24px;margin-top:24px}.manuscript-answer label>span{font-weight:400}.manuscript-reading [data-manuscript-reveal]{margin-bottom:10px;width:100%;white-space:normal}
+/* Print only reveals actually opened by the learner. */
+@media print{.manuscript-answer[hidden]{display:none!important}.manuscript-gate{background:none;padding:0}.manuscript-reading [data-manuscript-reading][hidden]{display:block!important}}

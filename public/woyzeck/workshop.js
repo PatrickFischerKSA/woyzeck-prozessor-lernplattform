@@ -1,6 +1,6 @@
 /* Learning artefacts remain local. No server, generated scoring or automatic approval. */
-const journalKeys = ['question', 'hypothesis', 'entryObservation', 'manuscriptObservation', 'evidence', 'reading', 'counter', 'peer', 'revision'];
-const journalLabels = {question:'Forschungsfrage',hypothesis:'Erste Vermutung',entryObservation:'Erster Befund zur Leseprobe',manuscriptObservation:'Befund an der Originalhandschrift',evidence:'Beobachtung am Text',reading:'Meine Deutung',counter:'Gegenbeleg / andere Lesart',peer:'Rückmeldung aus dem Gespräch',revision:'Revidierte These'};
+const journalKeys = ['question', 'hypothesis', 'entryObservation', 'manuscriptObservation', 'manuscriptLieblingReading', 'manuscriptLieblingHypothesis', 'manuscriptLieblingRevision', 'manuscriptIstReading', 'manuscriptIstHypothesis', 'manuscriptIstRevision', 'manuscriptDialogReading', 'manuscriptDialogHypothesis', 'manuscriptDialogRevision', 'evidence', 'reading', 'counter', 'peer', 'revision'];
+const journalLabels = {question:'Forschungsfrage',hypothesis:'Erste Vermutung',entryObservation:'Erster Befund zur Leseprobe',manuscriptObservation:'Befund an der Originalhandschrift','manuscriptLieblingReading':'Textspur A: Entzifferungsversuch','manuscriptLieblingHypothesis':'Textspur A: Vermutung zur Überarbeitung','manuscriptLieblingRevision':'Textspur A: Vergleich nach dem Aufdecken','manuscriptIstReading':'Textspur B: Entzifferungsversuch','manuscriptIstHypothesis':'Textspur B: Vermutung zur Überarbeitung','manuscriptIstRevision':'Textspur B: Vergleich nach dem Aufdecken','manuscriptDialogReading':'Textspur C: Entzifferungsversuch','manuscriptDialogHypothesis':'Textspur C: Vermutung zur Überarbeitung','manuscriptDialogRevision':'Textspur C: Vergleich nach dem Aufdecken',evidence:'Beobachtung am Text',reading:'Meine Deutung',counter:'Gegenbeleg / andere Lesart',peer:'Rückmeldung aus dem Gespräch',revision:'Revidierte These'};
 function cleanJournal(value) {
   return Object.fromEntries(journalKeys.map(key => [key, typeof value?.[key] === 'string' ? value[key] : '']));
 }
@@ -191,7 +191,7 @@ document.querySelector('#restoreInput').addEventListener('change',async event=>{
     if((data.versions.A&&!nextVersions.A)||(data.versions.B&&!nextVersions.B))throw Error('Ungültige Fassungen');
     if(!confirm('Diese Sicherung ersetzt dein Denkprotokoll, deine Fassungen A und B und die aktuelle Montage. Fortfahren?'))return;
     journal=cleanJournal(data.journal);versions=nextVersions;transitionNotes=cleanTransitionNotes(data.transitionNotes);build=[...data.build];notesInput.value=data.notes;
-    localStorage.setItem('woyzeckNotes',data.notes);saveBuild();persistWorkshop();restoreJournalFields();renderBuild();renderVersions();message('Sicherung eingelesen.');
+    localStorage.setItem('woyzeckNotes',data.notes);saveBuild();persistWorkshop();restoreJournalFields();renderBuild();renderVersions();document.dispatchEvent(new Event("manuscriptrestore"));message('Sicherung eingelesen.');
   }catch{message('Diese Datei ist keine gültige Woyzeck-Sicherung. Dein Arbeitsstand bleibt erhalten.');}
   finally{event.target.value='';}
 });

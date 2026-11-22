@@ -53,3 +53,9 @@ Die Einführung enthält Foliohandschrift I, p. 1 (Marburger Ausgabe Digital, Ba
 Drei auswählbare Stellen zeigen die Streichungen „Liebling“ (H1,1, Z. 6), „Ist“ (Z. 7) und den nachgetragenen Dialog Soldat/Margreth (Z. 8–9, editorisch als Späteintrag erläutert). Daneben stehen ausdrücklich didaktisch vereinfachte Auszüge der differenzierten Umschrift (MBA 7.1, S. 4): https://www.marburger-buechner-ausgabe.de/textview?ccl1=43&p1=4&l1=6
 
 Die roten Bildrahmen sind Lernhilfen und kein Teil des Originals. Zoom und Seitenübersicht erschliessen das Bild per Maus und Tastatur; alle Auszüge werden auch gedruckt. Die eigene Beobachtung wird unter `manuscriptObservation` im bestehenden Denkprotokoll gespeichert und mit exportiert/gesichert.
+
+### Zuerst selbst entziffern
+
+Die drei Auswahlknöpfe benennen zunächst nur Textspur A–C und die Zeilen. Umschrift und Erläuterung sind im ausgelieferten HTML verborgen. Für jede Stelle müssen ein eigener Entzifferungsversuch und eine Vermutung zur Überarbeitung vorliegen; Leerzeichen allein schalten nichts frei, inhaltliche Unsicherheit ist erlaubt. Das Aufdecken ist eine bewusste Aktion und bewertet die Einträge nicht. Ein gesondertes Vergleichsfeld hält spätere Korrekturen fest, ohne den ersten Versuch zu ersetzen. Die neun neuen Felder nutzen das bestehende Denkprotokoll und sind in Export und JSON-Sicherung enthalten. Beim Neuladen oder Sicherungsimport bleiben die Antworten erhalten, die Umschriften sind wieder zugedeckt. Geschlossene Umschriften werden auch beim Drucken nicht aufgedeckt.
+
+`tests/manuscript-inquiry.test.mjs` prüft die Freischaltung pro Textspur, das Bewahren eigener Versuche und das erneute Zudecken beim Import.
