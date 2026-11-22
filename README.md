@@ -37,3 +37,11 @@ node --test tests/rendered-html.test.mjs
 ```
 
 Die vorhandene Sites-/Vinext-Konfiguration bleibt für diesen zweiten Hostingweg bestehen; der GitHub-Pages-Workflow nutzt Next.js.
+
+## Anmoderation und Fassungsvergleich
+
+Der Einstieg erklärt Flucht, wissenschaftliche Qualifikation, Zürcher Lehrtätigkeit, parallele Schreibarbeit und Tod im Februar 1837. Die Ansteckung beim Präparieren bleibt ausdrücklich eine Vermutung. Quellen: Patrick Fischers [Georg B.](https://www.zurichstories.org/georgbPatrickFischer/index.html), der [Editionsbericht der Marburger Ausgabe, Band 7.2, S. 86](https://www.marburger-buechner-ausgabe.de/textview?ccl1=8&p1=86&l1=1), HLS und Deutsche Biographie. Die Autopsie des Textkörpers ist als heutiges methodisches Arbeitsbild ausgewiesen. Eine kleine Leseprobe motiviert das Montieren und speichert einen ersten Befund.
+
+Der A/B-Vergleich unterscheidet Umordnungen von blossen Positionsverschiebungen durch Einfügen oder Weglassen. Geänderte Nachbarschaften einschliesslich Anfang und Schluss erhalten eigene Begründungsfelder. Texte bleiben dem exakten Paar von Szenenfolgen zugeordnet (`woyzeckTransitionNotes`), sind im Text-Export und in der JSON-Sicherung enthalten und werden beim Import wiederhergestellt. Alte Sicherungen bleiben lesbar.
+
+`node --test tests/comparison.test.mjs` prüft Reihenfolge, Übergänge und Zuordnung der Begründungen unabhängig vom Build.

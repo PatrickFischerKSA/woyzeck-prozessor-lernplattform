@@ -1,6 +1,6 @@
 /* Learning artefacts remain local. No server, generated scoring or automatic approval. */
-const journalKeys = ['question', 'hypothesis', 'evidence', 'reading', 'counter', 'peer', 'revision'];
-const journalLabels = {question:'Forschungsfrage',hypothesis:'Erste Vermutung',evidence:'Beobachtung am Text',reading:'Meine Deutung',counter:'Gegenbeleg / andere Lesart',peer:'Rückmeldung aus dem Gespräch',revision:'Revidierte These'};
+const journalKeys = ['question', 'hypothesis', 'entryObservation', 'evidence', 'reading', 'counter', 'peer', 'revision'];
+const journalLabels = {question:'Forschungsfrage',hypothesis:'Erste Vermutung',entryObservation:'Erster Befund zur Leseprobe',evidence:'Beobachtung am Text',reading:'Meine Deutung',counter:'Gegenbeleg / andere Lesart',peer:'Rückmeldung aus dem Gespräch',revision:'Revidierte These'};
 function cleanJournal(value) {
   return Object.fromEntries(journalKeys.map(key => [key, typeof value?.[key] === 'string' ? value[key] : '']));
 }
@@ -11,6 +11,7 @@ function cleanVersion(value) {
 let journal = cleanJournal(readStored('woyzeckJournal', {}));
 let versions = readStored('woyzeckVersions', {});
 versions = {A:cleanVersion(versions?.A), B:cleanVersion(versions?.B)};
+let transitionNotes = cleanTransitionNotes(readStored('woyzeckTransitionNotes', {}));
 let toastTimer;
 function message(text) {
   const output = document.querySelector('#workshopMessage');
@@ -22,6 +23,7 @@ function persistWorkshop() {
   try {
     localStorage.setItem('woyzeckJournal',JSON.stringify(journal));
     localStorage.setItem('woyzeckVersions',JSON.stringify(versions));
+    localStorage.setItem('woyzeckTransitionNotes',JSON.stringify(transitionNotes));
     document.querySelector('#saveStatus').textContent = 'Lokal in diesem Browser gespeichert';
   } catch {
     document.querySelector('#saveStatus').textContent = 'Speichern nicht möglich – bitte exportieren';
@@ -30,7 +32,7 @@ function persistWorkshop() {
 }
 function showView() {
   const hash = location.hash.slice(1);
-  const aliases = {material:'werkstatt',montage:'werkstatt',textlabor:'perspektiven',opfer:'perspektiven',vergleich:'perspektiven',figuren:'perspektiven'};
+  const aliases = {entstehung:'auftakt',autopsie:'auftakt',leseprobe:'auftakt',material:'werkstatt',montage:'werkstatt',textlabor:'perspektiven',opfer:'perspektiven',vergleich:'perspektiven',figuren:'perspektiven'};
   const selected = aliases[hash] || (['auftakt','werkstatt','perspektiven','protokoll'].includes(hash) ? hash : 'auftakt');
   document.querySelectorAll('.view').forEach(view => {view.hidden = view.id !== selected;});
   document.querySelectorAll('[data-view]').forEach(link => {
@@ -63,6 +65,9 @@ document.querySelectorAll('[data-question]').forEach(button => button.addEventLi
 function renderVersions() {
   const container = document.querySelector('#versionComparison');
   container.replaceChildren();
+  const a = versions.A?.scenes, b = versions.B?.scenes;
+  const comparison = a && b ? compareMontages(a, b) : null;
+  const context = comparison ? montageComparisonKey(a, b) : null;
   ['A','B'].forEach(key => {
     const version = versions[key];
     const card = document.createElement('article');card.className = 'version-card';
@@ -71,7 +76,29 @@ function renderVersions() {
     else {
       const time = document.createElement('time');time.dateTime=version.savedAt;time.textContent=new Date(version.savedAt).toLocaleString('de-CH');card.append(time);
       if(version.question){const q=document.createElement('p');q.textContent=version.question;card.append(q);}
-      const list = document.createElement('ol');version.scenes.forEach(id => {const li=document.createElement('li');li.textContent=`${id}. ${sceneById(id).title}`;list.append(li);});card.append(list);
+      const list = document.createElement('ol');
+      list.className = 'comparison-scenes';
+      version.scenes.forEach((id, index) => {
+        const li = document.createElement('li');
+        if (comparison) li.append(renderTransition(comparison[`transitions${key}`][index], key, context));
+        const scene = document.createElement('div');scene.className = 'comparison-scene';
+        const position = document.createElement('span');position.className = 'comparison-position';position.textContent = `${key}${index + 1}`;
+        const title = document.createElement('strong');title.textContent = `Karte ${id} · ${sceneById(id).title}`;
+        scene.append(position, title);
+        if (comparison) {
+          let status = '', kind = '';
+          if (comparison.moved.includes(id)) {status = `Verschoben · A${a.indexOf(id) + 1} / B${b.indexOf(id) + 1}`;kind = 'moved';}
+          else if (comparison.shifted.includes(id)) {status = `Position gerückt · A${a.indexOf(id) + 1} / B${b.indexOf(id) + 1}`;kind = 'shifted';}
+          else if (comparison.added.includes(id)) {status = 'Nur in B · hinzugefügt';kind = 'added';}
+          else if (comparison.removed.includes(id)) {status = 'Nur in A · weggelassen';kind = 'removed';}
+          else {status = 'Gleiche Position';kind = 'unchanged';}
+          scene.classList.add(`scene-${kind}`);
+          const badge = document.createElement('span');badge.className = 'scene-change';badge.textContent = status;scene.append(badge);
+        }
+        li.append(scene);list.append(li);
+      });
+      card.append(list);
+      if (comparison) card.append(renderTransition(comparison[`transitions${key}`].at(-1), key, context));
       if(version.notes){const notes=document.createElement('blockquote');notes.textContent=version.notes;card.append(notes);}
       const load=document.createElement('button');load.textContent=`Fassung ${key} laden`;load.type='button';
       load.addEventListener('click',() => {
@@ -82,15 +109,41 @@ function renderVersions() {
     }
     container.append(card);
   });
-  const a=versions.A?.scenes,b=versions.B?.scenes;
   let difference='Sichere zwei Fassungen, um die Veränderung deiner Anordnung sichtbar zu machen.';
   if(a&&b){
-    const added=b.filter(id=>!a.includes(id));const removed=a.filter(id=>!b.includes(id));
-    const moved=b.filter(id=>a.includes(id)&&a.indexOf(id)!==b.indexOf(id));
+    const {added, removed, moved, shifted} = comparison;
     if(!added.length&&!removed.length&&!moved.length) difference='A und B haben dieselbe Szenenfolge. Welche andere Anordnung könnte deine Vermutung herausfordern?';
-    else difference=`Von A zu B: ${added.length} Szene(n) hinzugefügt, ${removed.length} weggelassen, ${moved.length} gemeinsame Szene(n) an anderer Position. Welche Änderung verändert deine Lesart am stärksten?`;
+    else difference=`Von A zu B: ${added.length} Szene(n) hinzugefügt, ${removed.length} weggelassen, ${moved.length} Szene(n) umgeordnet, ${shifted.length} nur in der Positionsnummer gerückt. Begründe die veränderte Wirkung direkt an den markierten Übergängen.`;
   }
   document.querySelector('#versionDifference').textContent=difference;
+}
+function transitionLabel(edge) {
+  const name = id => `Karte ${id} · ${sceneById(id).title}`;
+  if (edge.from === null) return `Anfang: ${edge.to === null ? 'leere Fassung' : name(edge.to)}`;
+  if (edge.to === null) return `Schluss nach ${name(edge.from)}`;
+  return `${name(edge.from)} → ${name(edge.to)}`;
+}
+function renderTransition(edge, side, context) {
+  const block = document.createElement('div');
+  block.className = `comparison-transition${edge.changed ? ' transition-changed' : ''}`;
+  if (!edge.changed) {
+    const hint = document.createElement('span');hint.textContent = edge.from === null ? 'Gleicher Anfang' : edge.to === null ? 'Gleicher Schluss' : 'Übergang unverändert';block.append(hint);return block;
+  }
+  const tag = document.createElement('strong');tag.className = 'transition-tag';
+  tag.textContent = side === 'A' ? 'In B entfallen' : 'In B neu';
+  const description = document.createElement('p');description.textContent = transitionLabel(edge);
+  const label = document.createElement('label');
+  const caption = document.createElement('span');caption.textContent = side === 'A' ? 'Welche Lesart legt diese Verbindung in A nahe?' : 'Wie verändert diese Verbindung in B deine Deutung?';
+  const input = document.createElement('textarea');input.rows = 3;
+  const noteKey = `${side}:${edge.from ?? 'start'}:${edge.to ?? 'end'}`;
+  input.value = transitionNotes[context]?.[noteKey] || '';
+  input.setAttribute('aria-label', `Fassung ${side}, ${transitionLabel(edge)}: Begründung`);
+  input.placeholder = side === 'A' ? 'In A erwarte oder vermute ich …, weil … Textbeleg: …' : 'Gegenüber A erscheint … jetzt …, weil … Textbeleg: …';
+  input.addEventListener('input', () => {
+    if (!transitionNotes[context]) transitionNotes[context] = {};
+    transitionNotes[context][noteKey] = input.value;persistWorkshop();
+  });
+  label.append(caption, input);block.append(tag, description, label);return block;
 }
 function saveVersion(key) {
   if(!build.length){message('Wähle zuerst mindestens eine Szene für deine Fassung.');return;}
@@ -113,11 +166,20 @@ function exportPortfolio(){
   sequence('Aktuelle Montage',build,notesInput.value);
   ['A','B'].forEach(key=>{if(versions[key]){lines.push(`Forschungsfrage ${key}: ${versions[key].question||'Noch offen'}`);sequence(`Gesicherte Fassung ${key}`,versions[key].scenes,versions[key].notes);}});
   lines.push(document.querySelector('#versionDifference').textContent);
+  if (versions.A && versions.B) {
+    const comparison = compareMontages(versions.A.scenes, versions.B.scenes);
+    const context = montageComparisonKey(versions.A.scenes, versions.B.scenes);
+    lines.push('', 'BEGRÜNDUNGEN AN DEN VERÄNDERTEN ÜBERGÄNGEN');
+    ['A','B'].forEach(side => comparison[`transitions${side}`].filter(edge => edge.changed).forEach(edge => {
+      const key = `${side}:${edge.from ?? 'start'}:${edge.to ?? 'end'}`;
+      lines.push(`Fassung ${side}: ${transitionLabel(edge)}`, transitionNotes[context]?.[key] || 'Noch offen', '');
+    }));
+  }
   downloadFile('woyzeck-denkprotokoll.txt',lines.join('\n'),'text/plain;charset=utf-8');message('Denkprotokoll exportiert.');
 }
 document.querySelector('#journalExportBtn').addEventListener('click',exportPortfolio);
 document.querySelector('#backupBtn').addEventListener('click',()=>{
-  downloadFile('woyzeck-sicherung.json',JSON.stringify({format:'woyzeck-workshop-v1',journal,versions,build,notes:notesInput.value},null,2),'application/json');message('Sicherung heruntergeladen.');
+  downloadFile('woyzeck-sicherung.json',JSON.stringify({format:'woyzeck-workshop-v1',journal,versions,transitionNotes,build,notes:notesInput.value},null,2),'application/json');message('Sicherung heruntergeladen.');
 });
 document.querySelector('#restoreInput').addEventListener('change',async event=>{
   const file=event.target.files[0];if(!file)return;
@@ -128,7 +190,7 @@ document.querySelector('#restoreInput').addEventListener('change',async event=>{
     const nextVersions={A:cleanVersion(data.versions.A),B:cleanVersion(data.versions.B)};
     if((data.versions.A&&!nextVersions.A)||(data.versions.B&&!nextVersions.B))throw Error('Ungültige Fassungen');
     if(!confirm('Diese Sicherung ersetzt dein Denkprotokoll, deine Fassungen A und B und die aktuelle Montage. Fortfahren?'))return;
-    journal=cleanJournal(data.journal);versions=nextVersions;build=[...data.build];notesInput.value=data.notes;
+    journal=cleanJournal(data.journal);versions=nextVersions;transitionNotes=cleanTransitionNotes(data.transitionNotes);build=[...data.build];notesInput.value=data.notes;
     localStorage.setItem('woyzeckNotes',data.notes);saveBuild();persistWorkshop();restoreJournalFields();renderBuild();renderVersions();message('Sicherung eingelesen.');
   }catch{message('Diese Datei ist keine gültige Woyzeck-Sicherung. Dein Arbeitsstand bleibt erhalten.');}
   finally{event.target.value='';}

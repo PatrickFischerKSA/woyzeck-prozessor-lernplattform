@@ -23,6 +23,7 @@ jobs:
       - run: npx next build
         env:
           NEXT_PUBLIC_BASE_PATH: /woyzeck-prozessor-lernplattform
+      - run: node --test tests/*.test.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
