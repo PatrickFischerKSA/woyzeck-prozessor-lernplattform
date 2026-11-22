@@ -1,6 +1,6 @@
 /* Learning artefacts remain local. No server, generated scoring or automatic approval. */
-const journalKeys = ['question', 'hypothesis', 'entryObservation', 'evidence', 'reading', 'counter', 'peer', 'revision'];
-const journalLabels = {question:'Forschungsfrage',hypothesis:'Erste Vermutung',entryObservation:'Erster Befund zur Leseprobe',evidence:'Beobachtung am Text',reading:'Meine Deutung',counter:'Gegenbeleg / andere Lesart',peer:'Rückmeldung aus dem Gespräch',revision:'Revidierte These'};
+const journalKeys = ['question', 'hypothesis', 'entryObservation', 'manuscriptObservation', 'evidence', 'reading', 'counter', 'peer', 'revision'];
+const journalLabels = {question:'Forschungsfrage',hypothesis:'Erste Vermutung',entryObservation:'Erster Befund zur Leseprobe',manuscriptObservation:'Befund an der Originalhandschrift',evidence:'Beobachtung am Text',reading:'Meine Deutung',counter:'Gegenbeleg / andere Lesart',peer:'Rückmeldung aus dem Gespräch',revision:'Revidierte These'};
 function cleanJournal(value) {
   return Object.fromEntries(journalKeys.map(key => [key, typeof value?.[key] === 'string' ? value[key] : '']));
 }
@@ -32,7 +32,7 @@ function persistWorkshop() {
 }
 function showView() {
   const hash = location.hash.slice(1);
-  const aliases = {entstehung:'auftakt',autopsie:'auftakt',leseprobe:'auftakt',material:'werkstatt',montage:'werkstatt',textlabor:'perspektiven',opfer:'perspektiven',vergleich:'perspektiven',figuren:'perspektiven'};
+  const aliases = {entstehung:'auftakt',autopsie:'auftakt',handschrift:'auftakt',leseprobe:'auftakt',material:'werkstatt',montage:'werkstatt',textlabor:'perspektiven',opfer:'perspektiven',vergleich:'perspektiven',figuren:'perspektiven'};
   const selected = aliases[hash] || (['auftakt','werkstatt','perspektiven','protokoll'].includes(hash) ? hash : 'auftakt');
   document.querySelectorAll('.view').forEach(view => {view.hidden = view.id !== selected;});
   document.querySelectorAll('[data-view]').forEach(link => {
