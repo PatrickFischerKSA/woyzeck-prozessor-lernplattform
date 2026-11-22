@@ -339,6 +339,7 @@ const speechStatus = document.querySelector("#speechStatus");
 function readStored(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
 }
+let readingRevealedFor = null;
 let build = readStored("woyzeckBuild", []);
 if (!Array.isArray(build)) build = [];
 build = [...new Set(build.filter(id => Number.isInteger(id) && scenes.some(scene => scene.id === id)))];
@@ -848,6 +849,10 @@ function motifLine(sequence) {
 }
 
 function renderReading() {
+  if (readingRevealedFor !== montageArgumentKey(build)) {
+    [plotOutput, interpretationOutput, murderOutput].forEach(output => { output.textContent = ""; });
+    return;
+  }
   const sequence = build.map(sceneById).filter(Boolean);
   if (!sequence.length) {
     plotOutput.textContent = "Generiere oder baue eine Reihenfolge, dann entsteht hier eine Zusammenfassung.";

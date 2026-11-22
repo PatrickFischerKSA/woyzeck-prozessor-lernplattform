@@ -12,6 +12,7 @@ let journal = cleanJournal(readStored('woyzeckJournal', {}));
 let versions = readStored('woyzeckVersions', {});
 versions = {A:cleanVersion(versions?.A), B:cleanVersion(versions?.B)};
 let transitionNotes = cleanTransitionNotes(readStored('woyzeckTransitionNotes', {}));
+let montageArguments = cleanMontageArguments(readStored('woyzeckMontageArguments', {}));
 let toastTimer;
 function message(text) {
   const output = document.querySelector('#workshopMessage');
@@ -24,6 +25,7 @@ function persistWorkshop() {
     localStorage.setItem('woyzeckJournal',JSON.stringify(journal));
     localStorage.setItem('woyzeckVersions',JSON.stringify(versions));
     localStorage.setItem('woyzeckTransitionNotes',JSON.stringify(transitionNotes));
+    localStorage.setItem('woyzeckMontageArguments',JSON.stringify(montageArguments));
     document.querySelector('#saveStatus').textContent = 'Lokal in diesem Browser gespeichert';
   } catch {
     document.querySelector('#saveStatus').textContent = 'Speichern nicht möglich – bitte exportieren';
@@ -39,6 +41,7 @@ function showView() {
     if(link.dataset.view === selected) link.setAttribute('aria-current','page');
     else link.removeAttribute('aria-current');
   });
+  if (selected === 'protokoll') renderVersions();
   if (hash === 'vergleich') document.querySelector('#otherWorks').open = true;
   if (hash === 'figuren') document.querySelector('#figuren').open = true;
   if (aliases[hash]) document.getElementById(hash)?.scrollIntoView({block:'start'});
@@ -100,6 +103,15 @@ function renderVersions() {
       card.append(list);
       if (comparison) card.append(renderTransition(comparison[`transitions${key}`].at(-1), key, context));
       if(version.notes){const notes=document.createElement('blockquote');notes.textContent=version.notes;card.append(notes);}
+      const argument = montageArguments[montageArgumentKey(version.scenes)];
+      if (argument) {
+        for (const [field, label] of [['reading','Eigene Deutung'],['evidence','Textbelege und Begründung'],['revision','Vergleich mit Vorschlägen']]) {
+          if (!argument[field]) continue;
+          const caption = document.createElement('strong');caption.textContent = label;
+          const text = document.createElement('p');text.textContent = argument[field];
+          card.append(caption, text);
+        }
+      }
       const load=document.createElement('button');load.textContent=`Fassung ${key} laden`;load.type='button';
       load.addEventListener('click',() => {
         if(!confirm(`Fassung ${key} laden? Sie ersetzt deine aktuelle Montage und Regiebegründung. Sichere den aktuellen Entwurf bei Bedarf zuerst als A oder B.`)) return;
@@ -162,7 +174,11 @@ function downloadFile(name,content,type){
 function exportPortfolio(){
   const lines=['WOYZECK · MEINE MONTAGEWERKSTATT',new Date().toLocaleString('de-CH'),'Textgrundlage: https://buechnerportal.de/werke/woyzeck/','Karten sind didaktische Paraphrasen; Nummern bezeichnen keine autorisierte Szenenfolge.',''];
   journalKeys.forEach(key=>lines.push(journalLabels[key],journal[key]||'Noch offen',''));
-  const sequence=(title,ids,notes)=>{lines.push(title,...ids.map((id,i)=>`${i+1}. Karte ${id}: ${sceneById(id).title}`),'Regieidee / Begründung:',notes||'Noch offen','');};
+  const sequence=(title,ids,notes)=>{
+    lines.push(title,...ids.map((id,i)=>`${i+1}. Karte ${id}: ${sceneById(id).title}`),'Regieidee / Begründung:',notes||'Noch offen','');
+    const argument=montageArguments[montageArgumentKey(ids)];
+    for (const [field,label] of [['reading','Eigene Deutung dieser Szenenfolge'],['evidence','Textbelege und Begründung'],['revision','Vergleich mit Interpretationsvorschlägen']]) lines.push(label,argument?.[field]||'Noch offen','');
+  };
   sequence('Aktuelle Montage',build,notesInput.value);
   ['A','B'].forEach(key=>{if(versions[key]){lines.push(`Forschungsfrage ${key}: ${versions[key].question||'Noch offen'}`);sequence(`Gesicherte Fassung ${key}`,versions[key].scenes,versions[key].notes);}});
   lines.push(document.querySelector('#versionDifference').textContent);
@@ -179,7 +195,7 @@ function exportPortfolio(){
 }
 document.querySelector('#journalExportBtn').addEventListener('click',exportPortfolio);
 document.querySelector('#backupBtn').addEventListener('click',()=>{
-  downloadFile('woyzeck-sicherung.json',JSON.stringify({format:'woyzeck-workshop-v1',journal,versions,transitionNotes,build,notes:notesInput.value},null,2),'application/json');message('Sicherung heruntergeladen.');
+  downloadFile('woyzeck-sicherung.json',JSON.stringify({format:'woyzeck-workshop-v1',journal,versions,transitionNotes,montageArguments,build,notes:notesInput.value},null,2),'application/json');message('Sicherung heruntergeladen.');
 });
 document.querySelector('#restoreInput').addEventListener('change',async event=>{
   const file=event.target.files[0];if(!file)return;
@@ -190,7 +206,7 @@ document.querySelector('#restoreInput').addEventListener('change',async event=>{
     const nextVersions={A:cleanVersion(data.versions.A),B:cleanVersion(data.versions.B)};
     if((data.versions.A&&!nextVersions.A)||(data.versions.B&&!nextVersions.B))throw Error('Ungültige Fassungen');
     if(!confirm('Diese Sicherung ersetzt dein Denkprotokoll, deine Fassungen A und B und die aktuelle Montage. Fortfahren?'))return;
-    journal=cleanJournal(data.journal);versions=nextVersions;transitionNotes=cleanTransitionNotes(data.transitionNotes);build=[...data.build];notesInput.value=data.notes;
+    journal=cleanJournal(data.journal);versions=nextVersions;transitionNotes=cleanTransitionNotes(data.transitionNotes);montageArguments=cleanMontageArguments(data.montageArguments);readingRevealedFor=null;build=[...data.build];notesInput.value=data.notes;
     localStorage.setItem('woyzeckNotes',data.notes);saveBuild();persistWorkshop();restoreJournalFields();renderBuild();renderVersions();document.dispatchEvent(new Event("manuscriptrestore"));message('Sicherung eingelesen.');
   }catch{message('Diese Datei ist keine gültige Woyzeck-Sicherung. Dein Arbeitsstand bleibt erhalten.');}
   finally{event.target.value='';}

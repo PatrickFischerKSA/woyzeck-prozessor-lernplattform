@@ -11,6 +11,6 @@ test('Pages export contains the working learning application and its scripts',as
   assert.equal(new Set(ids).size,ids.length,'All anchor and control IDs must be unique');
   for(const match of html.matchAll(/href="#([^"]+)"/g))assert.ok(ids.includes(match[1]),`Missing anchor ${match[1]}`);
   for(const match of html.matchAll(/(?:src|href)="([^"#]+\.(?:js|css|jpg))(?:\?[^"\s]*)?"/g))await access(new URL(`woyzeck/${match[1]}`,root));
-  for(const id of ['inquiryInput','saveABtn','saveBBtn','versionComparison','restoreInput','manuscriptViewport','manuscriptImage','manuscriptZoom'])assert.ok(ids.includes(id),`Missing learning control ${id}`);
+  for(const id of ['inquiryInput','saveABtn','saveBBtn','versionComparison','restoreInput','manuscriptViewport','manuscriptImage','manuscriptZoom','montageReadingInput','montageEvidenceInput','montageRevisionInput','montageSuggestions','revealMontageBtn'])assert.ok(ids.includes(id),`Missing learning control ${id}`);
   assert.doesNotMatch(html,/<video|codex-preview/);
 });

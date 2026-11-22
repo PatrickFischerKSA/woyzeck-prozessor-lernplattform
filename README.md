@@ -59,3 +59,11 @@ Die roten Bildrahmen sind Lernhilfen und kein Teil des Originals. Zoom und Seite
 Die drei Auswahlknöpfe benennen zunächst nur Textspur A–C und die Zeilen. Umschrift und Erläuterung sind im ausgelieferten HTML verborgen. Für jede Stelle müssen ein eigener Entzifferungsversuch und eine Vermutung zur Überarbeitung vorliegen; Leerzeichen allein schalten nichts frei, inhaltliche Unsicherheit ist erlaubt. Das Aufdecken ist eine bewusste Aktion und bewertet die Einträge nicht. Ein gesondertes Vergleichsfeld hält spätere Korrekturen fest, ohne den ersten Versuch zu ersetzen. Die neun neuen Felder nutzen das bestehende Denkprotokoll und sind in Export und JSON-Sicherung enthalten. Beim Neuladen oder Sicherungsimport bleiben die Antworten erhalten, die Umschriften sind wieder zugedeckt. Geschlossene Umschriften werden auch beim Drucken nicht aufgedeckt.
 
 `tests/manuscript-inquiry.test.mjs` prüft die Freischaltung pro Textspur, das Bewahren eigener Versuche und das erneute Zudecken beim Import.
+
+## Eigene Deutung vor automatischen Montagevorschlägen
+
+In der Montage werden zuerst eine eigene Deutung und begründende Textbelege erfasst. Erst danach lässt sich die regelbasierte Interpretation bewusst aufdecken. Die Prüfung bestätigt nur vorhandene Einträge, nicht ihre inhaltliche Richtigkeit. Ein eigenes Vergleichsfeld hält Einwände und Revisionen fest. Vorschläge werden vor dem Aufdecken nicht erzeugt; auch der Aktualisieren-Knopf kann die Freischaltung nicht umgehen. Der Schrittmodus enthält nur eine Beschreibung der bisherigen Anordnung und eine offene Frage.
+
+Die Argumente liegen unter `woyzeckMontageArguments`, zugeordnet zur exakten Szenenfolge. Umstellen, Hinzufügen oder Entfernen deckt die Vorschläge wieder zu und lädt die Begründung der neuen Folge (falls schon vorhanden). Beim Wiederherstellen einer alten Folge erscheinen deren eigene Einträge wieder; die Vorschläge bleiben zunächst verborgen. A/B-Anzeige und Text-Export enthalten die eigenen Deutungen, Belege und Vergleiche. JSON-Sicherungen bewahren alle Argumente; ältere Sicherungen ohne diese Daten bleiben importierbar. Automatische Vorschläge werden nicht in den Text-Export eingefügt oder beim Druck aufgedeckt.
+
+`tests/montage-inquiry.test.mjs` prüft Freischaltung, explizites Aufdecken, direkte Aktualisierung, Umstellen, erneutes Laden und Validierung der Sicherungsdaten.

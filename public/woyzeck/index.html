@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Eine offene Montagewerkstatt zu Büchners Woyzeck: Szenen ordnen, Deutungen am Text prüfen und gemeinsam weiterdenken."><title>Woyzeck · Montagewerkstatt</title><link rel="stylesheet" href="styles.css?v=20261122-entziffern"></head>
+<html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Eine offene Montagewerkstatt zu Büchners Woyzeck: Szenen ordnen, Deutungen am Text prüfen und gemeinsam weiterdenken."><title>Woyzeck · Montagewerkstatt</title><link rel="stylesheet" href="styles.css?v=20261122-montage"></head>
 <body>
 <a class="skip-link" href="#workspace">Zum Arbeitsbereich</a>
 <aside class="sidebar">
@@ -88,24 +88,24 @@
 
         <ol id="buildList" class="build-list" aria-label="Eigene Szenenfolge"></ol>
 
-        <details class="reading-output" aria-labelledby="readingTitle">
-          <summary>Deutungsvorschläge als Gegenprobe</summary><p>Regelbasiert erzeugt, keine Musterlösung. Prüfe die Aussagen am Originaltext und suche einen Gegenbeleg.</p><div class="reading-head">
-            <h3 id="readingTitle">Anregungen prüfen</h3>
-            <button id="refreshReadingBtn" type="button">Aktualisieren</button>
-          </div>
-          <div>
-            <h3>Handlung</h3>
-            <p id="plotOutput">Generiere oder baue eine Reihenfolge, dann entsteht hier eine Zusammenfassung.</p>
-          </div>
-          <div>
-            <h3>Woyzeck und Marie</h3>
-            <p id="interpretationOutput">Die Vorschlagslogik reagiert auf Anfang, Ende, Mordposition und Motivfolge.</p>
-          </div>
-          <div>
-            <h3>Gewalt und Verantwortung</h3>
-            <p id="murderOutput">Sobald Szene 20 enthalten ist, wird vorgeschlagen, wie die Montage den Mord lesbar macht.</p>
-          </div>
-        </details>
+        <section class="montage-argument" aria-labelledby="montageArgumentTitle">
+          <p class="eyebrow">ZUERST DEINE EIGENE LESART</p>
+          <h3 id="montageArgumentTitle">Was macht deine Anordnung sichtbar?</h3>
+          <p>Formuliere eine Deutung deiner aktuellen Fassung und begründe sie am Originaltext. Beziehe dich auf konkrete Szenen und darauf, was ihre Reihenfolge verändert.</p>
+          <label for="montageReadingInput">Meine Deutung dieser Szenenfolge<textarea id="montageReadingInput" rows="4" placeholder="Weil ich … vor … setze, erscheint … Für diese Lesart spricht …"></textarea></label>
+          <label for="montageEvidenceInput">Textbelege und Begründung<span>Nenne die Szenen sowie Zitate oder genaue Textbeobachtungen mit Seiten- oder Zeilenangabe deiner Ausgabe. Erkläre, wie sie deine Deutung stützen.</span><textarea id="montageEvidenceInput" rows="5" placeholder="In Szene … heisst es … (Ausgabe, Seite/Zeile …). Das stützt meine Deutung, weil … Ein weiterer Beleg ist …"></textarea></label>
+          <p id="montageGateStatus" class="montage-gate" role="status">Baue zuerst eine Fassung und halte deine Deutung mit Textbelegen fest.</p>
+          <button id="revealMontageBtn" type="button" aria-expanded="false" aria-controls="montageSuggestions" aria-describedby="montageGateStatus" disabled>Interpretationsvorschläge aufdecken</button>
+          <p class="storage-note">Die Freischaltung bestätigt keine richtige Interpretation. Prüfe Belege und Schlussfolgerungen am Text und im Gespräch. Deine Einträge gehören zu genau dieser Szenenfolge und erscheinen wieder, wenn du sie erneut zusammenstellst.</p>
+          <section id="montageSuggestions" class="reading-output" aria-labelledby="readingTitle" hidden>
+            <div class="reading-head"><h3 id="readingTitle">Vorschläge als Gegenprobe</h3><button id="refreshReadingBtn" type="button">Aktualisieren</button></div>
+            <p>Regelbasiert erzeugte Anregungen, keine Musterlösung. Vergleiche mit deiner eigenen Deutung: Was passt? Was lässt sich am Text widerlegen?</p>
+            <div><h3>Handlung und Anordnung</h3><p id="plotOutput"></p></div>
+            <div><h3>Woyzeck und Marie</h3><p id="interpretationOutput"></p></div>
+            <div><h3>Gewalt und Verantwortung</h3><p id="murderOutput"></p></div>
+          </section>
+          <label for="montageRevisionInput">Mein Vergleich mit den Vorschlägen<span>Halte Bestätigungen, Einwände und Änderungen fest. Deine erste Deutung bleibt darüber stehen.</span><textarea id="montageRevisionInput" rows="4" placeholder="Der Vorschlag … überzeugt mich, weil … Ich widerspreche … Mein Textbeleg dafür ist …"></textarea></label>
+        </section>
 
         <div class="save-actions"><button id="saveABtn" type="button">Als Fassung A sichern</button><button id="saveBBtn" type="button">Als Fassung B sichern</button></div><p class="storage-note">A und B im Denkprotokoll vergleichen. Deine aktuelle Fassung bleibt bearbeitbar.</p><label class="notes">
           <span>Regieidee / Begründung</span>
@@ -322,4 +322,4 @@
       </article>
     </template>
 
-<script src="app.js"></script><script src="comparison.js"></script><script src="workshop.js?v=20261122-entziffern"></script><script src="manuscript.js?v=20261122-entziffern"></script></body></html>
+<script src="montage-arguments.js?v=20261122-montage"></script><script src="app.js?v=20261122-montage"></script><script src="comparison.js"></script><script src="workshop.js?v=20261122-montage"></script><script src="manuscript.js?v=20261122-montage"></script><script src="montage-inquiry.js?v=20261122-montage"></script></body></html>
