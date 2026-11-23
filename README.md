@@ -67,3 +67,9 @@ In der Montage werden zuerst eine eigene Deutung und begründende Textbelege erf
 Die Argumente liegen unter `woyzeckMontageArguments`, zugeordnet zur exakten Szenenfolge. Umstellen, Hinzufügen oder Entfernen deckt die Vorschläge wieder zu und lädt die Begründung der neuen Folge (falls schon vorhanden). Beim Wiederherstellen einer alten Folge erscheinen deren eigene Einträge wieder; die Vorschläge bleiben zunächst verborgen. A/B-Anzeige und Text-Export enthalten die eigenen Deutungen, Belege und Vergleiche. JSON-Sicherungen bewahren alle Argumente; ältere Sicherungen ohne diese Daten bleiben importierbar. Automatische Vorschläge werden nicht in den Text-Export eingefügt oder beim Druck aufgedeckt.
 
 `tests/montage-inquiry.test.mjs` prüft Freischaltung, explizites Aufdecken, direkte Aktualisierung, Umstellen, erneutes Laden und Validierung der Sicherungsdaten.
+
+## Rückwärts erzählter Auftakt (23. November 2026)
+
+Der Einstieg beginnt mit Büchners Tod am 19. Februar 1837 in der Spiegelgasse und führt rückwärts über Forschung und Schreiben, Ankunft in Zürich und Flucht aus Hessen. Die mögliche Ansteckung beim Präparieren bleibt ausdrücklich eine Vermutung. Die Lernwege und Freischaltungen bleiben erhalten.
+
+Bildquellen: `assets/buechner-sterbezimmer-rekonstruktion.jpg` stammt aus Peter Brunners [„Danke den Wörtlichnehmern“](https://geschwisterbuechner.de/?p=2820), veröffentlicht am 18. Februar 2016. Sichtbare Bildlegende: Rekonstruktion des Sterbezimmers in der Darmstädter Ausstellung 2013, Foto Peter Brunner. Es wird nicht als historische Raumaufnahme ausgegeben. `assets/georg-b-zurichstories.jpg` ist das Titelbild aus Patrick Fischers [Georg B.](https://www.zurichstories.org/georgbPatrickFischer/index.html), Porträt nach Alexis Muston. Beide Bilder liegen unverändert lokal.
