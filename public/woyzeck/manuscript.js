@@ -35,7 +35,7 @@ manuscriptImage.addEventListener('error',()=>{
   document.querySelector('#manuscriptLive').textContent='Das Bild konnte nicht geladen werden. Öffne das verlinkte Faksimile in der Marburger Ausgabe.';
 });
 if (typeof ResizeObserver !== 'undefined') new ResizeObserver(()=>{
-  if (!document.querySelector('#auftakt').hidden && manuscriptViewport.clientWidth) focusManuscript();
+  if (!document.querySelector('#handschrift').hidden && manuscriptViewport.clientWidth) focusManuscript();
 }).observe(manuscriptViewport);
 if (manuscriptImage.complete) focusManuscript();
 

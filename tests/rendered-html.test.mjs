@@ -22,3 +22,26 @@ test('Pages export contains the working learning application and its scripts',as
     assert.match(body,/https:\/\/www\.zurichstories\.org\/georgbPatrickFischer\/assets\//,'Original films remain on Zurichstories');
   }
 });
+
+
+test('learning menu opens independent units instead of nested chapters',async()=>{
+  const html=await readFile(new URL('woyzeck/index.html',root),'utf8');
+  const stack=[]; const views=[];
+  for(const match of html.matchAll(/<\/?section\b[^>]*>/g)){
+    const tag=match[0];
+    if(tag.startsWith('</')){assert.ok(stack.length,'Balanced section closing');stack.pop();continue;}
+    const id=tag.match(/\bid="([^"]+)"/)?.[1];
+    if(/\bclass="[^"]*\bview\b/.test(tag)){
+      assert.equal(stack.length,0,`Unit ${id} must not be nested in another chapter`);
+      views.push(id);
+      assert.equal(/\bhidden\b/.test(tag),id!=='auftakt','Only the first unit is initially visible');
+    }
+    stack.push(id);
+  }
+  assert.equal(stack.length,0);
+  const menu=[...html.matchAll(/data-view="([^"]+)"/g)].map(m=>m[1]);
+  assert.equal(views.length,11);
+  assert.deepEqual(menu,views,'Every unit appears once in the menu and in learning order');
+  assert.equal([...html.matchAll(/class="unit-pagination"/g)].length,views.length,'Every unit offers a next step');
+  assert.ok(html.indexOf('id="forschungsfilme"')<html.indexOf('class="fish-cinema"'),'Fish films belong to their own unit');
+});

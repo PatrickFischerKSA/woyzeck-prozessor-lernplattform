@@ -32,22 +32,34 @@ function persistWorkshop() {
     message('Der Browser kann nicht speichern. Lade eine Sicherung herunter.');
   }
 }
-function showView() {
+function showView(event) {
   const hash = location.hash.slice(1);
-  const aliases = {entstehung:'auftakt',autopsie:'auftakt',handschrift:'auftakt',leseprobe:'auftakt',material:'werkstatt',montage:'werkstatt',textlabor:'perspektiven',opfer:'perspektiven',vergleich:'perspektiven',figuren:'perspektiven'};
-  const selected = aliases[hash] || (['auftakt','werkstatt','perspektiven','protokoll'].includes(hash) ? hash : 'auftakt');
-  document.querySelectorAll('.view').forEach(view => {view.hidden = view.id !== selected;});
+  const aliases = {material:'werkstatt',montage:'werkstatt',textlabor:'perspektiven',opfer:'perspektiven',vergleich:'perspektiven',figuren:'perspektiven'};
+  const views = [...document.querySelectorAll('.view')];
+  const selected = aliases[hash] || (views.some(view => view.id === hash) ? hash : 'auftakt');
+  const active = views.find(view => view.id === selected);
+  views.forEach(view => {
+    view.hidden = view !== active;
+    if (view.hidden) view.querySelectorAll('video').forEach(video => video.pause());
+  });
   document.querySelectorAll('[data-view]').forEach(link => {
     if(link.dataset.view === selected) link.setAttribute('aria-current','page');
     else link.removeAttribute('aria-current');
   });
+  const currentLink = document.querySelector(`[data-view="${selected}"]`);
+  document.querySelector('#mobileUnitName').textContent = currentLink.dataset.unitName;
   if (selected === 'protokoll') renderVersions();
   if (hash === 'vergleich') document.querySelector('#otherWorks').open = true;
   if (hash === 'figuren') document.querySelector('#figuren').open = true;
+  if (event && window.matchMedia('(max-width:850px)').matches) document.querySelector('#unitMenu').open = false;
   if (aliases[hash]) document.getElementById(hash)?.scrollIntoView({block:'start'});
   else window.scrollTo(0,0);
+  if (event) {active.setAttribute('tabindex','-1');active.focus({preventScroll:true});}
 }
 window.addEventListener('hashchange',showView);
+const unitMenu = document.querySelector('#unitMenu');
+unitMenu.open = !window.matchMedia('(max-width:850px)').matches;
+window.matchMedia('(max-width:850px)').addEventListener('change',event => {unitMenu.open = !event.matches;});
 showView();
 function syncQuestion() {
   document.querySelector('#currentQuestion').textContent = journal.question.trim() || 'Was verändert sich durch meine Szenenfolge?';
