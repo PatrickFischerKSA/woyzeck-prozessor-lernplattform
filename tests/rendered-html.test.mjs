@@ -10,7 +10,15 @@ test('Pages export contains the working learning application and its scripts',as
   const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]);
   assert.equal(new Set(ids).size,ids.length,'All anchor and control IDs must be unique');
   for(const match of html.matchAll(/href="#([^"]+)"/g))assert.ok(ids.includes(match[1]),`Missing anchor ${match[1]}`);
-  for(const match of html.matchAll(/(?:src|href)="([^"#]+\.(?:js|css|jpg))(?:\?[^"\s]*)?"/g))await access(new URL(`woyzeck/${match[1]}`,root));
+  for(const match of html.matchAll(/(?:src|href|poster)="([^"#]+\.(?:js|css|jpg))(?:\?[^"\s]*)?"/g))if(!/^https?:/.test(match[1]))await access(new URL(`woyzeck/${match[1]}`,root));
   for(const id of ['inquiryInput','saveABtn','saveBBtn','versionComparison','restoreInput','manuscriptViewport','manuscriptImage','manuscriptZoom','montageReadingInput','montageEvidenceInput','montageRevisionInput','montageSuggestions','revealMontageBtn'])assert.ok(ids.includes(id),`Missing learning control ${id}`);
-  assert.doesNotMatch(html,/<video|codex-preview/);
+  assert.doesNotMatch(html,/codex-preview/);
+  const videos=[...html.matchAll(/<video\b([^>]*)>([\s\S]*?)<\/video>/g)];
+  assert.equal(videos.length,4,'Three fish films and the grave film are embedded');
+  for(const [,attrs,body] of videos){
+    assert.match(attrs,/\bcontrols\b/,'Learners control playback');
+    assert.match(attrs,/aria-label=/,'Every film has an accessible name');
+    assert.doesNotMatch(attrs,/\bautoplay\b/,'Films start only on request');
+    assert.match(body,/https:\/\/www\.zurichstories\.org\/georgbPatrickFischer\/assets\//,'Original films remain on Zurichstories');
+  }
 });
