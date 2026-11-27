@@ -40,7 +40,7 @@ test('learning menu opens independent units instead of nested chapters',async()=
   }
   assert.equal(stack.length,0);
   const menu=[...html.matchAll(/data-view="([^"]+)"/g)].map(m=>m[1]);
-  assert.equal(views.length,11);
+  assert.equal(views.length,13);
   assert.deepEqual(menu,views,'Every unit appears once in the menu and in learning order');
   assert.equal([...html.matchAll(/class="unit-pagination"/g)].length,views.length,'Every unit offers a next step');
   assert.ok(html.indexOf('id="forschungsfilme"')<html.indexOf('class="fish-cinema"'),'Fish films belong to their own unit');

@@ -89,3 +89,11 @@ Der Auftakt erhält einen dunklen Bild-/Textraum, das Grab einen eigenen rostrot
 Die Einführung ist in acht eigenständige Ansichten aufgeteilt; hinzu kommen die drei bisherigen Arbeitsbereiche. Das Menü gruppiert elf Einträge unter Geschichte, Forschung und Textwerkstatt. Grab, Lebensumstände, Fischforschung, Filmbeiträge, Textautopsie, Originalhandschrift und Montageprobe liegen jeweils auf einer eigenen Ansicht. Nur die gewählte Einheit wird angezeigt. Jede Einheit nennt ihren Untersuchungsfokus und bietet Zurück/Weiter. Auf kleinen Bildschirmen ist das Menü aufklappbar und schliesst nach der Wahl. URLs, Browsernavigation und Direktlinks zu Unterbereichen funktionieren weiter. Beim Wechsel werden Videos in verlassenen Einheiten pausiert. Eingaben und gespeicherte Fassungen bleiben erhalten. Die Handschrift-Fokussierung bezieht sich jetzt auf ihre eigene Ansicht.
 
 Der Exporttest sichert elf gleichrangige Ansichten, ein vollständiges Menü, den Lernweg und die anfängliche Sichtbarkeit ab.
+
+## Historischer Woyzeck und Erbsendiät (27. November 2026)
+
+Zwei neue Einheiten erweitern das Menü auf 13 Ansichten: `historischer-fall` (nach Exil & Zürich) und `erbsendiaet` (nach den Barbenfilmen). Beide enthalten eine eigene Untersuchung mit Textbelegen. `historicalCaseObservation` und `peasObservation` nutzen das bestehende Denkprotokoll, dessen Speicherung, Text-Export und JSON-Sicherung. Alte Sicherungen bleiben kompatibel; fehlende Felder werden leer initialisiert.
+
+Direkt geprüfte Quellen: MBA 7.2, Prozesschronik S. 350, 353–354 (`ccl1=50`); Einführung zum Clarus-Gutachten S. 257 (`ccl1=96`); H4,8, S. 26–27 (`ccl1=57`); Erläuterungen zu H4,8, S. 509–510 (`ccl1=66`). Der 2. Juni 1821 ist das in der Editionschronik angegebene Tatdatum. Die Getötete Johanna Christiane Woost wird mit Namen genannt. Historische Person, gerichtsärztliches Urteil und literarische Figur bleiben unterschieden. Die Erbsendiät wird im Kontext zeitgenössischer Nahrungsersatzversuche nach dem MBA-Kommentar erläutert, ohne sie dem historischen Woyzeck zuzuschreiben oder daraus eine eindeutige medizinische Ursache der Wahrnehmungsstörungen abzuleiten.
+
+Das vom Nutzer gewünschte Büchnerportal wurde verlinkt, war bei der Prüfung jedoch technisch nicht erreichbar (Zertifikats-/Abruffehler). Die inhaltlichen Belege wurden deshalb direkt in der Marburger Ausgabe gelesen.
