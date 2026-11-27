@@ -1,6 +1,6 @@
 /* Learning artefacts remain local. No server, generated scoring or automatic approval. */
 const journalKeys = ['question', 'hypothesis', 'entryObservation', 'historicalCaseObservation', 'peasObservation', 'manuscriptObservation', 'manuscriptLieblingReading', 'manuscriptLieblingHypothesis', 'manuscriptLieblingRevision', 'manuscriptIstReading', 'manuscriptIstHypothesis', 'manuscriptIstRevision', 'manuscriptDialogReading', 'manuscriptDialogHypothesis', 'manuscriptDialogRevision', 'evidence', 'reading', 'counter', 'peer', 'revision'];
-const journalLabels = {question:'Forschungsfrage',hypothesis:'Erste Vermutung',entryObservation:'Erster Befund zur Leseprobe',historicalCaseObservation:'Quellenvergleich: historischer Woyzeck und Dramenfigur',peasObservation:'Erbsendiät: Deutung, Belege und Montage',manuscriptObservation:'Befund an der Originalhandschrift','manuscriptLieblingReading':'Textspur A: Entzifferungsversuch','manuscriptLieblingHypothesis':'Textspur A: Vermutung zur Überarbeitung','manuscriptLieblingRevision':'Textspur A: Vergleich nach dem Aufdecken','manuscriptIstReading':'Textspur B: Entzifferungsversuch','manuscriptIstHypothesis':'Textspur B: Vermutung zur Überarbeitung','manuscriptIstRevision':'Textspur B: Vergleich nach dem Aufdecken','manuscriptDialogReading':'Textspur C: Entzifferungsversuch','manuscriptDialogHypothesis':'Textspur C: Vermutung zur Überarbeitung','manuscriptDialogRevision':'Textspur C: Vergleich nach dem Aufdecken',evidence:'Beobachtung am Text',reading:'Meine Deutung',counter:'Gegenbeleg / andere Lesart',peer:'Rückmeldung aus dem Gespräch',revision:'Revidierte These'};
+const journalLabels = {question:'Frage an den Text',hypothesis:'Erste Vermutung',entryObservation:'Beobachtungen zur Leseprobe',historicalCaseObservation:'Quellenvergleich: historischer Woyzeck und Dramenfigur',peasObservation:'Erbsendiät: Deutung, Belege und Montage',manuscriptObservation:'Beobachtungen an der Originalhandschrift','manuscriptLieblingReading':'Textspur A: Entzifferungsversuch','manuscriptLieblingHypothesis':'Textspur A: Vermutung zur Überarbeitung','manuscriptLieblingRevision':'Textspur A: Vergleich nach dem Aufdecken','manuscriptIstReading':'Textspur B: Entzifferungsversuch','manuscriptIstHypothesis':'Textspur B: Vermutung zur Überarbeitung','manuscriptIstRevision':'Textspur B: Vergleich nach dem Aufdecken','manuscriptDialogReading':'Textspur C: Entzifferungsversuch','manuscriptDialogHypothesis':'Textspur C: Vermutung zur Überarbeitung','manuscriptDialogRevision':'Textspur C: Vergleich nach dem Aufdecken',evidence:'Beobachtung am Text',reading:'Meine Deutung',counter:'Gegenbeleg / andere Lesart',peer:'Rückmeldung aus dem Gespräch',revision:'Was ich jetzt anders sehe'};
 function cleanJournal(value) {
   return Object.fromEntries(journalKeys.map(key => [key, typeof value?.[key] === 'string' ? value[key] : '']));
 }
@@ -49,7 +49,6 @@ function showView(event) {
   const currentLink = document.querySelector(`[data-view="${selected}"]`);
   document.querySelector('#mobileUnitName').textContent = currentLink.dataset.unitName;
   if (selected === 'protokoll') renderVersions();
-  if (hash === 'vergleich') document.querySelector('#otherWorks').open = true;
   if (hash === 'figuren') document.querySelector('#figuren').open = true;
   if (event && window.matchMedia('(max-width:850px)').matches) document.querySelector('#unitMenu').open = false;
   if (aliases[hash]) document.getElementById(hash)?.scrollIntoView({block:'start'});
@@ -126,7 +125,7 @@ function renderVersions() {
       }
       const load=document.createElement('button');load.textContent=`Fassung ${key} laden`;load.type='button';
       load.addEventListener('click',() => {
-        if(!confirm(`Fassung ${key} laden? Sie ersetzt deine aktuelle Montage und Regiebegründung. Sichere den aktuellen Entwurf bei Bedarf zuerst als A oder B.`)) return;
+        if(!confirm(`Fassung ${key} laden? Sie ersetzt deine aktuelle Szenenfolge und die Notizen dazu. Sichere den aktuellen Entwurf bei Bedarf zuerst als A oder B.`)) return;
         build=[...version.scenes];notesInput.value=version.notes;
         localStorage.setItem('woyzeckNotes',version.notes);saveBuild();renderBuild();location.hash='werkstatt';message(`Fassung ${key} geladen.`);
       });card.append(load);
@@ -157,7 +156,7 @@ function renderTransition(edge, side, context) {
   tag.textContent = side === 'A' ? 'In B entfallen' : 'In B neu';
   const description = document.createElement('p');description.textContent = transitionLabel(edge);
   const label = document.createElement('label');
-  const caption = document.createElement('span');caption.textContent = side === 'A' ? 'Welche Lesart legt diese Verbindung in A nahe?' : 'Wie verändert diese Verbindung in B deine Deutung?';
+  const caption = document.createElement('span');caption.textContent = side === 'A' ? 'Wie hängen diese Szenen für dich in A zusammen?' : 'Was verstehst du in B anders als in A?';
   const input = document.createElement('textarea');input.rows = 3;
   const noteKey = `${side}:${edge.from ?? 'start'}:${edge.to ?? 'end'}`;
   input.value = transitionNotes[context]?.[noteKey] || '';
@@ -192,7 +191,7 @@ function exportPortfolio(){
     for (const [field,label] of [['reading','Eigene Deutung dieser Szenenfolge'],['evidence','Textbelege und Begründung'],['revision','Vergleich mit Interpretationsvorschlägen']]) lines.push(label,argument?.[field]||'Noch offen','');
   };
   sequence('Aktuelle Montage',build,notesInput.value);
-  ['A','B'].forEach(key=>{if(versions[key]){lines.push(`Forschungsfrage ${key}: ${versions[key].question||'Noch offen'}`);sequence(`Gesicherte Fassung ${key}`,versions[key].scenes,versions[key].notes);}});
+  ['A','B'].forEach(key=>{if(versions[key]){lines.push(`Frage an den Text ${key}: ${versions[key].question||'Noch offen'}`);sequence(`Gesicherte Fassung ${key}`,versions[key].scenes,versions[key].notes);}});
   lines.push(document.querySelector('#versionDifference').textContent);
   if (versions.A && versions.B) {
     const comparison = compareMontages(versions.A.scenes, versions.B.scenes);
@@ -203,7 +202,7 @@ function exportPortfolio(){
       lines.push(`Fassung ${side}: ${transitionLabel(edge)}`, transitionNotes[context]?.[key] || 'Noch offen', '');
     }));
   }
-  downloadFile('woyzeck-denkprotokoll.txt',lines.join('\n'),'text/plain;charset=utf-8');message('Denkprotokoll exportiert.');
+  downloadFile('woyzeck-notizen.txt',lines.join('\n'),'text/plain;charset=utf-8');message('Notizen heruntergeladen.');
 }
 document.querySelector('#journalExportBtn').addEventListener('click',exportPortfolio);
 document.querySelector('#backupBtn').addEventListener('click',()=>{
@@ -217,7 +216,7 @@ document.querySelector('#restoreInput').addEventListener('change',async event=>{
     if(data.format!=='woyzeck-workshop-v1'||!Array.isArray(data.build)||data.build.length>27||data.build.some(id=>!Number.isInteger(id)||!sceneById(id))||new Set(data.build).size!==data.build.length||!data.journal||!data.versions||typeof data.notes!=='string')throw Error('Ungültiges Format');
     const nextVersions={A:cleanVersion(data.versions.A),B:cleanVersion(data.versions.B)};
     if((data.versions.A&&!nextVersions.A)||(data.versions.B&&!nextVersions.B))throw Error('Ungültige Fassungen');
-    if(!confirm('Diese Sicherung ersetzt dein Denkprotokoll, deine Fassungen A und B und die aktuelle Montage. Fortfahren?'))return;
+    if(!confirm('Diese Sicherung ersetzt deine Notizen, deine Fassungen A und B und die aktuelle Montage. Fortfahren?'))return;
     journal=cleanJournal(data.journal);versions=nextVersions;transitionNotes=cleanTransitionNotes(data.transitionNotes);montageArguments=cleanMontageArguments(data.montageArguments);readingRevealedFor=null;build=[...data.build];notesInput.value=data.notes;
     localStorage.setItem('woyzeckNotes',data.notes);saveBuild();persistWorkshop();restoreJournalFields();renderBuild();renderVersions();document.dispatchEvent(new Event("manuscriptrestore"));message('Sicherung eingelesen.');
   }catch{message('Diese Datei ist keine gültige Woyzeck-Sicherung. Dein Arbeitsstand bleibt erhalten.');}

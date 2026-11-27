@@ -722,7 +722,7 @@ function renderStepState() {
     : "Du erzählst vorwärts. Die aktuell entwickelte Handlung führt";
   const openCount = scenes.length - sequence.length;
   const chain = sequence.map((scene) => scene.phase).join(" → ");
-  stepStoryOutput.textContent = `${directionText} von ${formatSceneRef(first)} bis ${formatSceneRef(last)}. Bisherige Bewegungslogik: ${chain}. Noch offen: ${openCount} Szene(n). Welche Wirkung hat dieser Übergang? Begründe sie im Denkprotokoll.`;
+  stepStoryOutput.textContent = `${directionText} von ${formatSceneRef(first)} bis ${formatSceneRef(last)}. Bisherige Folge: ${chain}. Noch offen: ${openCount} Szene(n). Welche Wirkung hat dieser Übergang? Schreib deine Erklärung unter «Meine Notizen» auf.`;
 }
 
 function generateCombination() {
@@ -868,9 +868,9 @@ function renderReading() {
   const finalScenes = sequence.slice(-4).map(formatSceneRef).join(" → ");
   const murderSentence = murderPos
     ? `Der Mord steht an Position ${murderPos} von ${sequence.length}.`
-    : "Die eigentliche Mordscene ist nicht enthalten; die Fassung bleibt als Vor- oder Nachgeschichte offen.";
+    : "Die eigentliche Mordszene ist nicht enthalten; die Fassung bleibt als Vor- oder Nachgeschichte offen.";
 
-  plotOutput.textContent = `Die Fassung beginnt mit ${formatSceneRef(first)} und endet mit ${formatSceneRef(last)}. Der erste Block lautet: ${earlyScenes}. Der Schlussblock lautet: ${finalScenes}. ${murderSentence} Dominante Motive dieser Montage sind ${motifLine(sequence)}.`;
+  plotOutput.textContent = `Die Fassung beginnt mit ${formatSceneRef(first)} und endet mit ${formatSceneRef(last)}. Am Anfang stehen: ${earlyScenes}. Am Schluss stehen: ${finalScenes}. ${murderSentence} Häufige Themen dieser Folge sind ${motifLine(sequence)}.`;
 
   interpretationOutput.textContent = buildInterpretation(sequence, murderPos);
   murderOutput.textContent = buildMurderExplanation(sequence, murderPos);
@@ -885,27 +885,27 @@ function buildInterpretation(sequence, murderPos) {
   const firstPressure = Math.min(...woyzeckPressurePositions);
   const afterMurderMarie = murderPos ? mariePositions.filter((pos) => pos > murderPos).length : 0;
 
-  let opening = "Die Entwicklung wird als Montage von sozialem Druck, Begehren und zunehmender Wahrnehmungsstörung lesbar.";
+  let opening = "Welche Rolle spielen Armut, Wünsche und Angst in deiner Reihenfolge? Achte darauf, was du zuerst über die Figuren erfährst.";
   if (startsWithMarie && !startsWithWoyzeck) {
-    opening = "Die Fassung setzt zuerst bei Marie an: Woyzecks Geschichte erscheint dadurch stärker als Reaktion auf eine bereits sichtbare Welt aus Blicken, Begehren und sozialem Urteil.";
+    opening = "Du beginnst mit Marie. Dadurch lernen wir zunächst ihre Sicht kennen. Wie verändert das deinen Blick auf Woyzeck?";
   } else if (startsWithWoyzeck) {
-    opening = "Die Fassung setzt zuerst bei Woyzeck an: Seine Armut, seine Arbeit am eigenen Körper und seine Wahrnehmungsstörung rahmen alles Folgende.";
+    opening = "Du beginnst mit Woyzeck. Was erfahren wir zuerst über ihn? Überlege, wie dieser Anfang beeinflusst, was du später über Marie denkst.";
   }
 
   const relation = firstMarie < firstPressure
-    ? "Marie ist früher profiliert als die Institutionen, die Woyzeck bedrängen; dadurch wirkt der Konflikt zunächst privater und erotischer."
-    : "Die Belastung Woyzecks erscheint vor Maries eigener Perspektive; dadurch rückt die Tat stärker in die Logik von Ausbeutung, Krankheit und Demütigung.";
+    ? "Du zeigst Marie, bevor wir mehr darüber erfahren, wie Woyzeck unter Druck gerät. Steht für dich deshalb zunächst die Beziehung der beiden im Vordergrund?"
+    : "Du zeigst früh, was Woyzeck belastet. Liest du die späteren Szenen dadurch eher als Folgen seiner Not? Welche Textstelle spricht dafür, welche dagegen?";
 
   const marieAfter = afterMurderMarie
-    ? `Dass ${afterMurderMarie} Marie-Szene(n) nach dem Mord liegen, erzeugt Rückblenden: Marie bleibt nicht nur Opfer, sondern wird nachträglich als begehrende, schuldempfindliche und sozial beobachtete Figur lesbar.`
-    : "Maries Szenen liegen vor allem vor dem Mord; ihre Entwicklung läuft auf die Tat zu und wird weniger als Rückblende gebrochen.";
+    ? `Du zeigst ${afterMurderMarie} Szene(n) mit Marie nach dem Mord. Du kannst sie als Rückblenden lesen. Was erfährst du dadurch im Nachhinein über ihr Leben?`
+    : "Welche Wünsche und Sorgen Maries werden in deiner Folge deutlich? Achte darauf, ob du sie nur im Hinblick auf den späteren Mord liest.";
 
   return `${opening} ${relation} ${marieAfter}`;
 }
 
 function buildMurderExplanation(sequence, murderPos) {
   if (!murderPos) {
-    return "Ohne Mordscene erklärt die Reihenfolge den Mord nur indirekt: über Eifersucht, Armut, Körperkontrolle, Wahn und die Gewalt der Institutionen.";
+    return "Ohne Mordszene erklärt die Reihenfolge den Mord nur indirekt: über Eifersucht, Armut, Körperkontrolle, Wahn und die Gewalt der Institutionen.";
   }
 
   const before = sequence.slice(0, murderPos - 1);
@@ -918,27 +918,27 @@ function buildMurderExplanation(sequence, murderPos) {
   const hasAftermathBefore = [21, 22, 23, 24, 25, 26, 27].some((id) => positionOf(id) && positionOf(id) < murderPos);
 
   const causeParts = [];
-  if (hasInstitutionsBefore) causeParts.push("institutionelle Demütigung");
+  if (hasInstitutionsBefore) causeParts.push("Demütigungen durch Hauptmann und Doktor");
   if (hasPublicHumiliationBefore) causeParts.push("öffentliche Kränkung");
-  if (hasWeaponBefore) causeParts.push("den konkreten Messerentschluss");
+  if (hasWeaponBefore) causeParts.push("den Kauf des Messers");
   if (beforeMotifs.includes("Wahn")) causeParts.push("Wahnstimmen");
-  if (beforeMotifs.includes("Armut")) causeParts.push("ökonomische Not");
+  if (beforeMotifs.includes("Armut")) causeParts.push("Geldnot");
 
-  let structure = `Vor dem Mord bündelt die Montage ${causeParts.length ? causeParts.join(", ") : "mehrere lose Spannungssignale"}.`;
+  let structure = `Vor dem Mord zeigst du ${causeParts.length ? causeParts.join(", ") : "verschiedene Hinweise auf den späteren Mord"}.`;
   if (murderPos <= 5) {
     structure += " Weil die Tat sehr früh erscheint, wird sie zum Rätsel oder Schockauftakt; die folgenden Szenen erklären nachträglich, wie es dazu kommen konnte.";
   } else if (murderPos >= sequence.length - 4) {
-    structure += " Weil die Tat sehr spät erscheint, wirkt die Reihenfolge kausal zugespitzt: Fast alles wird Vorbereitung, Druckaufbau und Verengung.";
+    structure += " Weil die Tat spät erscheint, können die vorherigen Szenen wie Schritte auf den Mord hin wirken. Welche davon liest du als Vorbereitung?";
   } else {
-    structure += " Weil die Tat in der Mitte steht, entsteht eine analytische Zweiteilung aus Vorgeschichte und Nachgeschichte.";
+    structure += " Die Tat steht in der Mitte. Davor siehst du ihre Vorgeschichte, danach ihre Folgen.";
   }
   if (hasAftermathBefore) {
-    structure += " Nachspiel- oder Befund-Szenen vor dem Mord machen die Fassung besonders experimentell: Sie zeigen erst Folgen und Spuren, bevor die Tat selbst sichtbar wird.";
+    structure += " Du zeigst Folgen des Mordes schon vor der Tat. Das kann beim Lesen die Frage wecken: Wie konnte es dazu kommen?";
   }
   if (afterMotifs.includes("Justiz") || afterMotifs.includes("Wissenschaft")) {
-    structure += " Nach dem Mord übernehmen Institutionen die Deutung; das verschiebt die Erklärung vom Einzeltäter zur gesellschaftlichen Fallmachung.";
+    structure += " Nach dem Mord sprechen andere über die Tat und den toten Körper. Wie verändert ihr Blick deine Sicht auf das Geschehen?";
   }
-  return `${structure} Diese Faktoren erklären Bedingungen und Eskalation, aber sie entschuldigen die Tat nicht: Woyzeck plant und vollzieht den Mord an Marie; ihre Wünsche, Untreue oder Ambivalenz übertragen keine Verantwortung auf sie.`;
+  return `${structure} Diese Zusammenhänge können Woyzecks Handeln erklären helfen. Die Verantwortung für den Mord an Marie bleibt bei ihm.`;
 }
 
 function characterSceneMatch(scene, character) {
@@ -1303,7 +1303,7 @@ document.querySelector("#clearBuildBtn").addEventListener("click", () => {
 });
 
 document.querySelector("#resetBtn").addEventListener("click", () => {
-  if (!confirm("Aktuelle Montage und Regiebegründung leeren? Gesicherte Fassungen A/B und dein Denkprotokoll bleiben erhalten.")) return;
+  if (!confirm("Aktuelle Montage und Regiebegründung leeren? Gesicherte Fassungen A/B und deine Notizen bleiben erhalten.")) return;
   searchInput.value = "";
   motifFilter.value = "all";
   figureFilter.value = "all";
@@ -1370,29 +1370,18 @@ customQuestionInput.addEventListener("keydown", (event) => {
 });
 
 const signalData = {
-  feld: { stamp: "H4,1 / WAHRNEHMUNG", quote: "Woyzeck.  Ja Andres; den Streif da über das Gras hin, da rollt Abends der Kopf, es hob ihn einmal einer auf, er meint es wär’ ein Igel. Drei Tag und drei Nächt und er lag auf den Hobelspänen (leise) Andres, das waren die Freimaurer, ich hab’s, die Freimaurer, still!", fragments: ["Kopf", "Igel", "Freimaurer", "still!"], reading: "Die Szene bestätigt nichts. Alltag, Sage und Verfolgungsgefühl senden gleichzeitig.", layers: [{k:"Form",v:"Andres’ Lied und Woyzecks Alarmrede laufen nebeneinander. Das Drama bietet keine Erzählinstanz, die entscheidet, welche Wahrnehmung gilt."},{k:"Realitätsstatus",v:"Ein Streifen im Gras ist sichtbar; Kopf, Igel und Freimaurer sind konkurrierende Deutungen. Beobachtung und Wahn lassen sich sprachlich nicht sauber trennen."},{k:"Folge",v:"Woyzeck erlebt die Welt nicht als neutralen Raum, sondern als adressierende Macht. Später werden aus Zeichen Befehle – doch ein innerer Befehl ist noch keine moralische Entlastung."}] },
-  labor: { stamp: "H4,8 / FREMDVERMESSUNG", quote: "Doctor.  Die Natur kommt, die Natur kommt! Die Natur! […] Hat er schon seine Erbsen gegessen, Woyzeck? – Es giebt eine Revolution in der Wissenschaft, ich sprenge sie in die Luft. Harnstoff, 0,10, salzsaures Ammonium, Hyperoxydul.", fragments: ["Natur", "Freiheit", "Erbsen", "0,10"], reading: "Der Mensch verschwindet zwischen Vertrag, Körperfunktion und Messwert. Freiheit ist hier die Sprache des Kontrolleurs.", layers: [{k:"Paradox",v:"Der Doktor erklärt den Menschen für frei, während er Ausscheidung, Nahrung und Verhalten vertraglich kontrolliert. Freiheit dient nicht Woyzeck, sondern begründet seine Bestrafbarkeit."},{k:"Sprachgewalt",v:"Lateinische Muskelbezeichnung, Messwert und Chemikalien verdrängen Schmerz und Hunger. Wissenschaft produziert Distanz, indem sie Erleben in Daten übersetzt."},{k:"Ökonomie",v:"Woyzeck verkauft nicht nur Arbeitszeit, sondern körperliche Selbstbestimmung. Armut verbindet Hauptmannsdienst, Erbsendiät und Familienversorgung zu einem Zwangszusammenhang."}] },
-  erbsen: { stamp: "1830ER / REALITÄTSANKER", quote: "ERBSE → SOLDATENKÖRPER → MESSREIHE → BILLIGE VERPFLEGUNG", fragments: ["Liebig", "Militär", "Versuch", "Körper"], reading: "Die Erbsenkost hat einen realen ernährungs- und militärhistorischen Horizont. Die direkte Ableitung der Büchner-Szene aus Liebigs Versuchen bleibt Forschungsdebatte.", layers: [{k:"Historischer Kern",v:"Im frühen 19. Jahrhundert wurden Ersatznahrung, Nährwert und kostengünstige Heeresverpflegung experimentell untersucht. Einseitige Erbsenkost ist deshalb mehr als ein frei erfundenes Symbol."},{k:"Liebig-Bezug",v:"Liebigs Gießener Ernährungs- und Stoffwechselforschung gehört in diesen Kontext. Ob Büchners konkrete Versuchsanordnung unmittelbar auf ihn zurückgeht, ist nicht abschließend gesichert."},{k:"Literarische Funktion",v:"Büchner verschränkt reale Wissenschaft mit grotesker Überzeichnung. Gerade diese Mischung verhindert die einfache Wahl zwischen Dokument und Fantasie."}] }
+  feld: { stamp: "H4,1 / WAHRNEHMUNG", quote: "Woyzeck.  Ja Andres; den Streif da über das Gras hin, da rollt Abends der Kopf, es hob ihn einmal einer auf, er meint es wär’ ein Igel. Drei Tag und drei Nächt und er lag auf den Hobelspänen (leise) Andres, das waren die Freimaurer, ich hab’s, die Freimaurer, still!", fragments: ["Kopf", "Igel", "Freimaurer", "still!"], reading: "Woyzeck entdeckt im Gras etwas Bedrohliches. Andres singt. Was lässt dich daran denken, dass beide die Situation ganz anders erleben?", layers: [{k:"Form",v:"Andres’ Lied und Woyzecks Alarmrede laufen nebeneinander. Das Drama bietet keine Erzählinstanz, die entscheidet, welche Wahrnehmung gilt."},{k:"Realitätsstatus",v:"Woyzeck spricht von einem Streifen im Gras, einem Kopf, einem Igel und den Freimaurern. Was nimmt er wahr? Wie erklärt er sich das?"},{k:"Folge",v:"Woyzeck fühlt sich bedroht und verfolgt. Später hört er Stimmen, die ihn zum Töten auffordern. Vergleiche die Stellen: Was verändert sich?"}] },
+  labor: { stamp: "H4,8 / BEIM DOKTOR", quote: "Doctor.  Die Natur kommt, die Natur kommt! Die Natur! […] Hat er schon seine Erbsen gegessen, Woyzeck? – Es giebt eine Revolution in der Wissenschaft, ich sprenge sie in die Luft. Harnstoff, 0,10, salzsaures Ammonium, Hyperoxydul.", fragments: ["Natur", "Freiheit", "Erbsen", "0,10"], reading: "Der Doktor behauptet, Woyzeck könne seinen Körper mit seinem Willen beherrschen. Zugleich bestimmt er, was Woyzeck essen darf. Wie passt das zusammen?", layers: [{k:"Paradox",v:"Der Doktor erklärt den Menschen für frei, während er Ausscheidung, Nahrung und Verhalten vertraglich kontrolliert. Freiheit dient nicht Woyzeck, sondern begründet seine Bestrafbarkeit."},{k:"Sprachgewalt",v:"Lateinische Muskelbezeichnung, Messwert und Chemikalien verdrängen Schmerz und Hunger. Wissenschaft produziert Distanz, indem sie Erleben in Daten übersetzt."},{k:"Ökonomie",v:"Woyzeck braucht das Geld, um Marie und das Kind zu unterstützen. Deshalb arbeitet er für den Hauptmann und nimmt am Experiment teil. Welche Wahl bleibt ihm?"}] },
+  erbsen: { stamp: "1830ER / ERNÄHRUNGSEXPERIMENTE", quote: "ERBSE → SOLDATENKÖRPER → MESSREIHE → BILLIGE VERPFLEGUNG", fragments: ["Liebig", "Militär", "Versuch", "Körper"], reading: "Zu Büchners Zeit suchte man nach billiger Nahrung für arme Menschen und Soldaten. Die Marburger Ausgabe bringt die Erbsendiät mit solchen Versuchen in Verbindung.", layers: [{k:"Historischer Kern",v:"Im frühen 19. Jahrhundert wurden Ersatznahrung, Nährwert und kostengünstige Heeresverpflegung experimentell untersucht. Einseitige Erbsenkost ist deshalb mehr als ein frei erfundenes Symbol."},{k:"Mögliche Vorlage",v:"Der Kommentar nennt Experimente mit Gelatine und Hülsenfrüchten in Frankreich und England. Sie könnten Büchner angeregt haben. Eine eindeutig belegte Vorlage ist damit noch nicht gefunden."},{k:"Literarische Funktion",v:"Büchner greift wissenschaftliche Fragen seiner Zeit auf und zeigt einen überheblichen Doktor. Welche Äusserungen machen dessen Verhalten lächerlich oder bedrohlich?"}] }
 };
 
-const reductionData = {
-  woyzeck: { name: "Franz Woyzeck", steps: ["Mensch", "Soldat", "Diener", "Versuchskörper", "Fall", "Täter"], koerper: {text:"Rasiert, ernährt, vermessen, vorgeführt: Woyzecks Körper bringt Einkommen und Daten, gehört ihm aber immer weniger.", evidence:"Hauptmannsszene, Erbsenvertrag, Hof des Doktors: Dienstleistung wird schrittweise zur öffentlichen Demonstration.", tension:"Der ausgebeutete Körper wird später selbst zum Träger tödlicher Gewalt.", boundary:"Körperliche Fremdbestimmung erklärt Verletzbarkeit; Messerankauf, Tat und Spurentilgung bleiben Handlungen."}, sprache:{text:"Befehle, Fachsprache, Volkslied und Stimmen dringen in Woyzecks Rede. Niemand übersetzt seine Not in eine anerkannte Sprache.",evidence:"Kurze Satzreste und Wiederholungen stehen gegen die ausgreifende Rede von Hauptmann und Doktor.",tension:"Sprachlosigkeit bedeutet nicht Willenlosigkeit; gerade vor der Tat verdichtet sich seine Sprache zum Entschluss.",boundary:"Nicht sprechen können ist nicht dasselbe wie nicht verantwortlich handeln können."}, institution:{text:"Militär, Medizin und Justiz sehen jeweils eine Funktion: Untergebener, Versuchsperson, Fall.",evidence:"Der Hauptmann moralisiert, der Doktor diagnostiziert, die Gerichtsmediziner verwerten den Leichnam als Besonderheit.",tension:"Institutionen produzieren Bedingungen der Gewalt und bleiben nach der Tat dennoch außerhalb des Täterbegriffs.",boundary:"Strukturelle Mitverantwortung darf individuelle Täterschaft nicht unsichtbar machen."}, realitaet:{text:"Montage, abrupte Schnitte und Stimmen destabilisieren die Wirklichkeit, ohne alle Ereignisse unentscheidbar zu machen.",evidence:"Wahnzeichen im Feld stehen neben überprüfbaren Handlungsschritten: Messer kaufen, Marie hinausführen, zurückkehren, Spuren beseitigen.",tension:"Das Drama verweigert eine eindeutige Diagnose, zeigt aber eine zunehmend gerichtete Tatvorbereitung.",boundary:"Epistemische Unsicherheit über Woyzecks Zustand ist keine Unsicherheit darüber, wer Marie tötet."} },
-  thiel: { name: "Bahnwärter Thiel", steps: ["Mensch", "Ehemann", "Bahnwärter", "Signal", "Gespaltener", "Täter"], koerper:{text:"Dienstplan, Gleis und Maschine takten Thiels Körper. Funktionieren ersetzt Entscheiden.",evidence:"Signalbewegungen und Bahnrhythmus strukturieren Alltag und Wahrnehmung; zuhause bleibt er gegenüber Lenes Gewalt passiv.",tension:"Physische Stärke kontrastiert mit familiärer Handlungsunfähigkeit.",boundary:"Passivität schützt Tobias nicht und macht Thiel nicht zum bloßen Opfer der Umstände."}, sprache:{text:"Maschinenrhythmus, Vision und Erzählerwahrnehmung überformen Thiels eigene Stimme.",evidence:"Die Novelle zeigt ihn häufiger in ritualisierten Bewegungen und inneren Bildern als in klärendem Gespräch.",tension:"Schweigen erscheint zugleich als Überforderung, Verdrängung und Entscheidung gegen Eingreifen.",boundary:"Fehlende Sprache vermindert nicht die Bedeutung seines Wissens um Tobias’ Gefährdung."}, institution:{text:"Die Bahn bestätigt Thiel als zuverlässige Funktion, während familiäre Gewalt im Privatraum unsichtbar bleibt.",evidence:"Berufliche Präzision und häusliches Versagen existieren nebeneinander, ohne dass das System Bahn den Widerspruch registriert.",tension:"Die Institution stabilisiert Identität und entleert sie zugleich.",boundary:"Die Maschine verursacht weder Lenes Misshandlung noch Thiels spätere Tötung."}, realitaet:{text:"Vision, Erinnerung und Außenwelt verschränken sich nach Tobias’ Tod bis zur psychischen Zerrüttung.",evidence:"Minna-Erinnerung, Bahnlärm und Todesbild überblenden sich; die Wahrnehmung wird symbolisch und halluzinatorisch.",tension:"Der Text macht den Zusammenbruch erfahrbar, ohne ihn medizinisch abschließend zu erklären.",boundary:"Dissoziation erklärt den Bruch; sie verwandelt Lene nicht in die Ursache ihres eigenen Todes."} },
-  brand: { name: "Vera Scherrer", steps: ["Mensch", "Mutter", "Verdächtige", "Diagnosekörper", "Medienfigur", "Fall"], koerper:{text:"Beobachtung und Diagnose machen Veras Körper zum lesbaren Indiz. Person und Befund drohen zusammenzufallen.",evidence:"Verhalten, Erschöpfung, Medikation und psychiatrische Zuschreibung werden von verschiedenen Figuren unterschiedlich gedeutet.",tension:"Ein Symptom kann real sein, ohne Tatbeweis zu sein; ein Tatbeweis ersetzt keine Erklärung des psychischen Zustands.",boundary:"Diagnose, Schuldfähigkeit und Täterschaft sind getrennte Prüfungsebenen."}, sprache:{text:"Erinnerung, Aussage, Akte und journalistische Rekonstruktion konkurrieren um Geltung.",evidence:"Der Roman verteilt Wissen auf Notruf, Befragung, Spur, Rückblick und fremde Einschätzung.",tension:"Widerspruch kann Lüge, Erinnerungslücke, Schutzbehauptung oder erzählerische Begrenzung bedeuten.",boundary:"Unsichere Rede verlangt Belegprüfung, weder automatische Schuld noch automatische Entlastung."}, institution:{text:"Polizei, Psychiatrie, Recht und Medien erzeugen verschiedene Versionen derselben Person.",evidence:"Jede Institution stellt andere Fragen: Was geschah? Was konnte sie erkennen? Wie ist Verhalten zu klassifizieren? Was lässt sich erzählen?",tension:"Mehr Perspektiven erzeugen nicht automatisch mehr Menschlichkeit; sie können eine Person auch vollständig zum Fall machen.",boundary:"Institutionelle Etiketten dürfen die getöteten Kinder und die Angehörigen nicht aus dem Zentrum drängen."}, realitaet:{text:"Spur und Erinnerung passen nicht stabil zusammen; Wahrheit entsteht nur im Abgleich heterogener Quellen.",evidence:"Innere Bilder besitzen subjektive Wahrheit, während kriminalistische Rekonstruktion nach intersubjektiv prüfbaren Beziehungen sucht.",tension:"Literarische Nähe zu einer Figur ist kein privilegierter Zugang zur faktischen Wahrheit.",boundary:"Empathie mit psychischer Desorientierung darf den Verlust der Opfer nicht relativieren."} }
-};
 
 const witnessData = {
-  marie: { label:"MARIE / EIGENES LEBEN",title:"Marie besitzt eine eigene Geschichte.",text:"Marie begehrt, lügt, schämt sich, sorgt, widerspricht. Sobald die Kamera bei ihr bleibt, wird Woyzecks Eifersucht vom Zentrum zur Bedrohung.",life:"Fenster, Schmuck, Tanz und Bibel zeigen keinen linearen moralischen Abstieg, sondern den engen Spielraum einer armen, öffentlich kontrollierten Mutter.",violence:"Sie wird von Margreth beschämt, vom Tambourmajor zugleich begehrt und bedrängt und von Woyzeck zunehmend als Besitz behandelt.",erasure:"Lesarten, die sie nur als ‚untreue Geliebte‘ führen, übernehmen Woyzecks Kränkung als Ordnung des Dramas.",losses:["Leben","Zukunft","Mutterschaft","eigene Erzählung"],boundary:"Der geplante Femizid ist Woyzecks Tat." },
-  bernhard: { label:"BERNHARD / ANGEHÖRIGER",title:"Verlust ist mehr als Information.",text:"Aussagen können geprüft werden, ohne Trauer in Verdacht aufzulösen. Als Vater und Partner verliert Bernhard Menschen – nicht nur Gewissheiten.",life:"Notruf, Aussagen und öffentliche Rekonstruktion zeigen nur Ausschnitte. Hinter der Quellenfunktion steht eine zerstörte Familienbiografie.",violence:"Er ist nicht körperliches Tatopfer, aber Angehöriger der getöteten Kinder und Betroffener einer langen kriminalistischen und medialen Verarbeitung.",erasure:"True-Crime-Logik reduziert Angehörige leicht auf Verdachtsmoment, Zeugenwert oder emotionale Reaktion.",losses:["Kinder","Familie","Privatheit","Vertrauen"],boundary:"Quellenkritik hebt Betroffenheit nicht auf." },
-  kinder: { label:"KINDER / KEINE REQUISITEN",title:"Die Zukunft fehlt im Täterplot.",text:"Sophie und ihre Geschwister im realen Fall, Christian im Drama, Tobias in Hauptmanns Novelle: Kinder tragen Folgen, die sie weder gewählt noch verursacht haben.",life:"Die Texte geben ihnen unterschiedlich viel Sprache. Gerade geringe Präsenz verlangt, Beziehungen, Abhängigkeit und Zukunft mitzulesen.",violence:"Tobias erlebt Misshandlung und tödliche Vernachlässigung; Christian verliert seine Mutter und möglicherweise auch den Vater; die Scherrer-Kinder werden getötet.",erasure:"Kinder werden besonders leicht zu Auslösern von Ermittlungen, Symbolen zerstörter Unschuld oder emotionalen Verstärkern.",losses:["Leben","Schutz","Eltern","Zukunft"],boundary:"Keine Gewaltdetails als Spannungsmittel." },
-  lene: { label:"LENE / DOPPELTE WAHRHEIT",title:"Gewalt erfahren. Gewalt ausgeübt.",text:"Lene misshandelt Tobias und wird von Thiel getötet. Digitale Perspektivverschiebung heißt hier: nichts verrechnen, nichts löschen.",life:"Als Arbeiterfrau in materieller Enge besitzt sie wenig gesellschaftliche Macht, innerhalb des Hauses aber erhebliche körperliche Macht über Tobias und Thiel.",violence:"Sie ist Täterin gegenüber Tobias und Opfer der tödlichen Gewalt Thiels. Diese Rollen folgen verschiedenen Beziehungen und dürfen nicht verrechnet werden.",erasure:"Eine rein dämonisierende Darstellung macht ihren Tod zur Strafe; eine rein sozialdeterministische Darstellung verwischt Tobias’ Leiden.",losses:["Leben","Stimme","Kontext","Ambivalenz"],boundary:"Ihre Gewalt entzieht ihr nicht den Opferstatus ihrer Tötung." }
+  marie: {label:"MARIE",title:"Was wünscht sich Marie?",text:"Marie kümmert sich um ihr Kind, betrachtet ihren Schmuck, geht tanzen und liest in der Bibel. Welche dieser Seiten lernst du in deiner Szenenfolge kennen?",life:"Achte darauf, was Marie selbst sagt und tut. Was erhofft sie sich vom Tambourmajor? Was bedeuten ihr Woyzeck und ihr Kind?",violence:"Woyzeck verdächtigt Marie und tötet sie. Untersuche, wie sich sein Verhalten ihr gegenüber verändert.",erasure:"Wenn du Marie nur als untreue Geliebte beschreibst, bleibt vieles von ihrem Leben unerzählt. Welche Szene zeigt mehr von ihr?",losses:["Leben","Wünsche","Beziehungen"],boundary:"Woyzecks Not kann helfen, sein Handeln zu verstehen. Sie entschuldigt den Mord an Marie nicht."},
+  kinder: {label:"MARIES KIND",title:"Was bleibt dem Kind?",text:"Marie und Woyzeck haben ein kleines Kind. Nach Maries Tod ist es ohne seine Mutter. Wie verändert sich dein Blick auf die Tat, wenn du an das Kind denkst?",life:"Suche die Stellen, in denen Marie bei ihrem Kind ist oder mit ihm spricht. Was erfährst du über ihren Alltag?",violence:"Der Mord nimmt dem Kind seine Mutter. Achte auch darauf, wie die anderen Figuren mit ihm umgehen.",erasure:"Das Kind kommt nur wenig zu Wort. Trotzdem betreffen die Ereignisse sein ganzes Leben. Welche deiner Szenen lässt das erkennen?",losses:["Mutter","Geborgenheit","Zukunft"],boundary:"Welche Fragen zur Zukunft des Kindes lässt der Text für dich offen?"}
 };
 
-let activeWork = "woyzeck";
-let activeLens = "koerper";
 const visitedSignals = new Set(["feld"]);
-const visitedWorks = new Set(["woyzeck"]);
-const visitedLenses = new Set(["koerper"]);
 const visitedWitnesses = new Set(["marie"]);
 
 function activateButtons(selector, active) {
@@ -1411,46 +1400,30 @@ function renderSignal(key) {
   if (remaining > 0) {
     const next = ["feld", "labor", "erbsen"].find((item) => !visitedSignals.has(item));
     const labels = { feld: "Feld", labor: "Labor", erbsen: "Archiv" };
-    guide.innerHTML = `<b>${visitedSignals.size}/3 Spuren geöffnet</b><span>Als Nächstes: ${labels[next]}. Prüfe, wodurch sich die Autorität über Wirklichkeit verändert.</span>`;
+    guide.innerHTML = `<b>${visitedSignals.size}/3 Spuren geöffnet</b><span>Als Nächstes: ${labels[next]}. Vergleiche, was Woyzeck selbst wahrnimmt und wie andere ihn beurteilen.</span>`;
   } else {
-    guide.innerHTML = `<b>Drei Spuren verfügbar</b><span>Welche Spur widerspricht deiner ersten Vermutung? Belege deine Antwort mit einer Textstelle; das Öffnen der Spuren entscheidet keine Deutung.</span>`;
+    guide.innerHTML = `<b>Drei Spuren verfügbar</b><span>Welche Stelle passt nicht zu deiner ersten Erklärung? Notiere sie und beschreibe, was du jetzt anders siehst.</span>`;
     guide.classList.add("complete");
   }
 }
 
-function renderReduction() {
-  const data = reductionData[activeWork];
-  document.querySelector("#reductionTrack").innerHTML = `<span class="track-name">${data.name}</span><div class="track-steps">${data.steps.map((step, index) => `<span style="--delay:${index * 55}ms">${step}</span>`).join("<i>→</i>")}</div>`;
-  const insight = data[activeLens];
-  document.querySelector("#reductionInsight").innerHTML = `<span>${activeLens.toUpperCase()}</span><div><p class="insight-thesis">${insight.text}</p><dl class="insight-grid"><div><dt>Textspur</dt><dd>${insight.evidence}</dd></div><div><dt>Spannung</dt><dd>${insight.tension}</dd></div><div class="boundary-cell"><dt>Verantwortungsgrenze</dt><dd>${insight.boundary}</dd></div></dl></div>`;
-  const guide = document.querySelector("#comparisonGuide");
-  if (visitedWorks.size < 2 || visitedLenses.size < 2) {
-    guide.innerHTML = `<b>${visitedWorks.size}/3 Werke · ${visitedLenses.size}/4 Linsen</b><span>Wechsle ${visitedWorks.size < 2 ? "jetzt das Werk" : "jetzt die Linse"}. Erst die Differenz macht aus drei Einzelbefunden einen Vergleich.</span>`;
-  } else {
-    guide.innerHTML = `<b>Perspektiven geöffnet</b><span>Gilt dieselbe Erklärung für beide Werke? Halte einen belegbaren Unterschied fest und prüfe, wo die Vergleichsthese nicht trägt.</span>`;
-    guide.classList.add("complete");
-  }
-}
 
 function renderWitness(key) {
   const data = witnessData[key];
-  document.querySelector("#witnessDisplay").innerHTML = `<span>${data.label}</span><h3>${data.title}</h3><p class="witness-lead">${data.text}</p><div class="witness-layers"><div><b>Eigenes Leben</b><p>${data.life}</p></div><div><b>Erfahrene Gewalt</b><p>${data.violence}</p></div><div><b>Gefahr der Auslöschung</b><p>${data.erasure}</p></div></div><div class="loss-tokens">${data.losses.map((loss) => `<b>${loss}</b>`).join("")}</div><footer>${data.boundary}</footer>`;
+  document.querySelector("#witnessDisplay").innerHTML = `<span>${data.label}</span><h3>${data.title}</h3><p class="witness-lead">${data.text}</p><div class="witness-layers"><div><b>Wünsche und Alltag</b><p>${data.life}</p></div><div><b>Erfahrene Gewalt</b><p>${data.violence}</p></div><div><b>Was leicht übersehen wird</b><p>${data.erasure}</p></div></div><div class="loss-tokens">${data.losses.map((loss) => `<b>${loss}</b>`).join("")}</div><footer>${data.boundary}</footer>`;
   const guide = document.querySelector("#witnessGuide");
-  const remaining = 4 - visitedWitnesses.size;
+  const remaining = 2 - visitedWitnesses.size;
   if (remaining > 0) {
-    guide.innerHTML = `<b>${visitedWitnesses.size}/4 Perspektiven im Bild</b><span>Noch ${remaining}: Mit jedem Wechsel verliert die Tätergeschichte ein Stück ihres Deutungsmonopols.</span>`;
+    guide.innerHTML = `<b>${visitedWitnesses.size}/2 Karten gelesen</b><span>Schau dir auch die andere Karte an. Was erfährst du über Marie und ihr Kind?</span>`;
   } else {
-    guide.innerHTML = `<b>Vier Perspektiven verfügbar</b><span>Welche Perspektive fehlt in deiner Montage? Ändere eine Szenenposition und begründe, was dadurch sichtbar wird.</span>`;
+    guide.innerHTML = `<b>Beide Karten gelesen</b><span>Welche Szene würdest du ergänzen oder verschieben, damit man mehr über Marie oder ihr Kind erfährt? Begründe deine Wahl.</span>`;
     guide.classList.add("complete");
   }
 }
 
 document.querySelectorAll(".signal-tab").forEach((button) => button.addEventListener("click", () => { visitedSignals.add(button.dataset.signal); activateButtons(".signal-tab", button); renderSignal(button.dataset.signal); }));
-document.querySelectorAll(".work-tab").forEach((button) => button.addEventListener("click", () => { activeWork = button.dataset.work; visitedWorks.add(activeWork); activateButtons(".work-tab", button); renderReduction(); }));
-document.querySelectorAll(".lens").forEach((button) => button.addEventListener("click", () => { activeLens = button.dataset.lens; visitedLenses.add(activeLens); activateButtons(".lens", button); renderReduction(); }));
 document.querySelectorAll(".witness-node").forEach((button) => button.addEventListener("click", () => { visitedWitnesses.add(button.dataset.witness); activateButtons(".witness-node", button); renderWitness(button.dataset.witness); }));
 renderSignal("feld");
-renderReduction();
 renderWitness("marie");
 
 populateFilters();

@@ -16,7 +16,7 @@ function updateMontageGate() {
     ? 'Wähle zuerst Szenen für deine eigene Fassung.'
     : !ready ? 'Halte zuerst deine Deutung und begründende Textbelege für diese Szenenfolge fest.'
     : revealed ? 'Vergleiche die Vorschläge mit deinen eigenen Einträgen. Deine Deutung und Belege bleiben erhalten.'
-    : 'Deutung und Textbelege sind festgehalten. Du kannst die Vorschläge jetzt als Gegenprobe aufdecken.';
+    : 'Deutung und Textbelege sind festgehalten. Du kannst die Vorschläge jetzt lesen und mit deiner Erklärung vergleichen.';
   renderReading();
 }
 function restoreMontageArgument() {
